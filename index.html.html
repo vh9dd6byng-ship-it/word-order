@@ -1,0 +1,796 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="color-scheme" content="light">
+<title>단어 배열 연습</title>
+<style>
+:root{--bg:#f2f2f2;--card:#fff;--line:#d2d2d2;--text:#222;--sub:#777;--ok:#2e7d32;--okbg:#e8f5e9;--bad:#c62828;--badbg:#fdecea}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,"Apple SD Gothic Neo","Noto Sans KR","Malgun Gothic",sans-serif}
+#app{max-width:820px;margin:0 auto;padding:0 14px 80px}
+.bar{position:sticky;top:0;z-index:10;display:flex;align-items:center;gap:8px;padding:10px 0;background:var(--bg);border-bottom:1px solid var(--line);margin-bottom:12px}
+.bar button{background:#fff;border:1px solid #bdbdbd;color:#555;border-radius:10px;padding:9px 16px;font-size:15px;font-weight:600}
+.bar button:active{background:#e6e6e6}
+.bar .t{margin-left:6px;font-size:15px;font-weight:700;color:#444;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.home{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:22vh}
+.home h1{grid-column:1/-1;margin:0 0 6px;text-align:center;font-size:24px;color:#444}
+.big{background:#fff;border:1px solid #c8c8c8;border-radius:16px;padding:34px 10px;font-size:20px;font-weight:700;color:#444}
+.big:active{background:#e6e6e6}
+.list{display:flex;flex-direction:column;gap:8px}
+.row{display:flex;align-items:center;gap:14px;background:#fff;border:1px solid #cfcfcf;border-radius:12px;padding:15px 16px;font-size:17px;text-align:left;color:#333;width:100%}
+.row:active{background:#e6e6e6}
+.row .n{min-width:52px;font-weight:700;color:#666}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;margin-bottom:14px}
+.head{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.num{display:inline-block;min-width:26px;height:26px;line-height:26px;text-align:center;border-radius:13px;background:#e4e4e4;color:#555;font-size:13px;font-weight:700;padding:0 6px}
+.spk{font-size:13px;font-weight:700;color:#666;background:#efefef;border-radius:8px;padding:3px 9px}
+.ko{font-size:15px;line-height:1.55;color:#555;margin:4px 0 12px}
+.slots{display:flex;flex-wrap:wrap;gap:8px;padding:10px;border-radius:12px;background:#fafafa;border:1px solid #e3e3e3;min-height:60px}
+.slot{min-width:58px;height:42px;border:1.5px dashed #bdbdbd;border-radius:10px;display:inline-flex;align-items:center;justify-content:center;background:#fff}
+.slot.filled{border:none;background:transparent;min-width:0}
+.slot.empty-bad{border-color:var(--bad);background:var(--badbg)}
+.bank{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px;padding:10px;background:#ececec;border-radius:12px;min-height:56px}
+.chip{display:inline-block;background:#fff;border:1px solid #b9b9b9;border-radius:10px;padding:0 12px;height:42px;line-height:40px;font-size:16px;white-space:nowrap;touch-action:none;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;cursor:grab}
+.chip.lift{opacity:.25}
+.chip.ghost{position:fixed;z-index:999;pointer-events:none;transform:translate(-50%,-60%);box-shadow:0 6px 16px rgba(0,0,0,.25);opacity:.95}
+.chip.ok{background:var(--okbg);border-color:var(--ok);color:#1b5e20}
+.chip.bad{background:var(--badbg);border-color:var(--bad);color:#8e1b1b}
+.card.locked .chip{cursor:default}
+.act{display:flex;gap:8px;margin-top:12px}
+.act button{background:#fff;border:1px solid #bdbdbd;color:#555;border-radius:10px;padding:9px 18px;font-size:15px;font-weight:600}
+.act button:active{background:#e6e6e6}
+.res{margin-top:12px;font-size:15px;line-height:1.5}
+.res b.ok{color:var(--ok)}
+.res b.bad{color:var(--bad)}
+.res .ans{margin-top:4px;color:#333;background:#f4f4f4;border-radius:10px;padding:10px 12px}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+//#PURE-START
+const EXAMS = {
+"모고25": [
+["18","고객 후기",`
+Dear Mr. Kelly, ## 친애하는 Kelly 씨께,
+My name is Mark Smith, and I am the manager of Lomos Tours. ## 제 이름은 Mark Smith이며, 저는 Lomos Tours의 매니저입니다.
+I express our sincere appreciation for your continued trust and loyalty. ## 저는 당신의 지속적인 신뢰와 충심에 우리의 진심 어린 감사를 표합니다.
+Next year, as part of a new promotional campaign, Lomos Tours will be airing an advertisement. ## 내년에, 새로운 홍보 캠페인의 일환으로, Lomos Tours는 광고를 방영하려고 합니다.
+We plan to include the experiences of some of our most valued clients. ## 우리는 우리의 가장 소중한 몇몇 고객님들의 경험을 담을 계획입니다.
+Since you traveled with us last summer, I would like to kindly ask if you would be willing to share a few words about your experience. ## 당신은 지난여름에 우리와 함께 여행하셨기에, 저는 당신의 경험에 대해 몇 마디 말씀을 기꺼이 공유해 주실 수 있는지 정중히 부탁드리고 싶습니다.
+Your feedback would be invaluable in helping us promote our services. ## 당신의 피드백은 우리가 서비스를 홍보하는 것을 도와주는 데 매우 소중할 것입니다.
+A member of our team will be in touch with you shortly. ## 우리 팀의 직원 한 명이 곧 연락드릴 것입니다.
+Thank you in advance for your contributions. ## 당신의 기여에 미리 감사드립니다.
+Warm regards, ## 따뜻한 안부를 전하며,
+`],
+["19","자동차 착각",`
+After finishing my shopping, I walked out of the grocery store and headed to the spot where I’d parked my car. ## 쇼핑을 마친 후에, 나는 식료품 가게를 걸어 나가 내가 차를 주차했던 장소로 향했다.
+But it wasn’t there. ## 그러나 그것이 거기에 없었다.
+I wasn’t the kind of person to forget where I’d parked. ## 나는 내가 주차했던 장소를 잊어버릴 그런 사람이 아니었다.
+I knew I was in the right place — so where was my car? ## 나는 내가 정확한 장소에 있다는 것을 알았지만, 그렇다면 내 차는 어디에 있는 걸까?
+I looked around, but nothing made sense. ## 나는 주위를 둘러보았지만, 도무지 아무것도 이해되지 않았다.
+Not knowing what to do, I called my husband at home and said, “My car is missing! I can’t find my car.” ## 무엇을 해야 할지 몰라, 나는 집에 있는 남편에게 전화를 걸어 “내 차가 없어졌어요! 나는 차를 못 찾겠어요.”라고 말했다.
+I heard him laughing on the other end of the line. ## 나는 그가 전화기의 반대편에서 웃는 것을 들었다.
+“Your car is here outside the house! ## “당신의 차는 여기 집 밖에 있어요!
+You took mine today, remember?” ## 당신은 오늘 내 차를 가져갔어요. 기억나죠?”
+I turned around — and there it was. ## 나는 돌아보았고, 그것은 거기에 있었다.
+I couldn’t help but laugh at myself. ## 나는 실소를 금할 수 없었다.
+With a sigh of relief, I walked over to the car. ## 안도의 숨을 내쉬며, 나는 차로 걸어갔다.
+Everything was fine after all. ## 결국 모든 것이 괜찮았다.
+`],
+["20","인간관계 유지",`
+One of the most important aspects of sustaining long-term relationships is communication. ## 장기적인 관계를 유지하는 데 가장 중요한 측면 중 하나는 소통이다.
+It’s easy to connect with someone and then let the relationship get stuck due to a lack of follow-up. ## 누군가와 친해지고 나서 추후 연락 부족으로 인해 그 관계가 정체되도록 내버려 두기 쉽다.
+To keep the connection alive, make a conscious effort to stay in touch. ## 관계를 유지하기 위해, 연락하고 지내려는 의식적인 노력을 기울여라.
+This doesn’t mean constantly reaching out with requests or updates but rather maintaining a friendly and consistent line of communication. ## 이는 요청이나 최근 소식을 가지고 끊임없이 연락을 취하는 것이 아니라 오히려 친근하고 일관된 소통의 끈을 유지하는 것을 의미한다.
+A simple message to check in or share something of value can go a long way in reinforcing your relationship. ## 안부를 확인하거나 가치 있는 무언가를 공유하는 간단한 메시지가 여러분의 관계를 강화하는 데 도움이 될 수 있다.
+For example, if you come across an article or resource that you think might interest a connection, share it with them, even if you haven’t spoken in a while. ## 예를 들어, 여러분이 자신과 관계가 있는 사람의 흥미를 끌 수 있다고 여기는 기사나 자료를 우연히 발견하면, 한동안 이야기하지 않았다고 할지라도 그들과 그것을 공유하라.
+This shows that you’re thinking of them and are invested in maintaining the relationship. ## 이는 여러분이 그들을 생각하고 있으며 관계를 지속하는 데 노력을 쏟고 있다는 것을 보여 준다.
+`],
+["21","도시 공원 개발",`
+Currently, urban regeneration projects in degraded areas have been promoted as improving the wellbeing of residents and solving environmental injustice problems. ## 현재, 낙후된 지역에서 도시 재생 프로젝트는 거주자들의 복지를 향상시키고 환경적 불평등 문제를 해결하는 것으로서 추진되어 왔다.
+However, such environmental improvements in ethnic communities and/or low-income households can create an urban green space paradox. ## 하지만, 소수민족 공동체들 및/또는 저소득층 가구에서 그러한 환경 개선은 도시 녹색 공간의 역설을 만들 수 있다.
+The creation of new, high-quality green spaces can increase attractiveness, making these neighbourhood more desirable. ## 새로운 양질의 녹색 공간의 조성은 매력을 증가시킬 수 있어 이 지역을 더 탐나게 만든다.
+By contrast, the cost of housing can rise, and residents may not be able to afford the rent. ## 대조적으로, 주거비가 오를 수 있고, 거주자들은 임대료를 지불할 여유가 없을지도 모른다.
+This results in the exclusion or displacement of the poor neighbourhood’s residents, who were intended to benefit from the ecosystem services provided by the new green space. ## 이는 가난한 지역 거주자들의 배제 혹은 퇴거를 야기하는데, 그들은 새로운 녹색 공간에 의해 제공되는 생태계 서비스로부터 혜택을 얻도록 의도되어 있었다.
+In turn, the residents may only be able to afford to live in a similar degraded neighbourhood to the one they left, with low access to green infrastructure. ## 결국, 그 거주자들은 녹색 사회 기반 시설에 접근성이 낮은 채로, 그들이 떠났던 곳과 비슷한 낙후된 지역에나 거주할 형편이 될 수 있을지도 모른다.
+`],
+["22","해양 생태계",`
+An increasing awareness of our effect on the ocean is slowly seeping into the public agenda, dragging behind it a conversation that is decades overdue. ## 해양에 미치는 우리의 영향에 대한 커지는 인식이 공공 안건으로 서서히 스며들면서, 수십 년 동안 미뤄 온 대화를 그것 뒤로 끌고 온다.
+But this conversation faces a massive obstacle. ## 하지만 이 대화는 거대한 장애물을 직면한다.
+It’s almost impossible to discuss what to do about something changing if you don’t initially know how it works. ## 만약 여러분이 그것이 어떻게 작동하는지를 애초에 알지 못한다면 변화하는 어떤 것에 대해 무엇을 해야 할지를 논의하는 것은 거의 불가능하다.
+If a doctor tells a patient that they have a problem with their kidneys, the patient probably already has at least a vague idea about where their kidneys are and what they’re up to. ## 만약 의사가 환자에게 신장에 문제가 있다고 말한다면, 그 환자는 아마도 신장이 어디에 있고 무엇을 하는지에 대해 적어도 막연한 이해는 이미 가지고 있을 것이다.
+They learned about that part of their own personal life-support system at school. ## 그들은 학교에서 자기 개인의 생명 유지 체계의 그 부분에 대해 배웠다.
+But that’s not the case for the oceans. ## 하지만 해양의 경우는 그렇지 않다.
+When we see a news story about the long-term decline in the numbers of krill in the Southern Ocean, it sounds generally like a bad thing. ## 우리가 남극해 크릴 수의 장기적 감소에 대한 신문 기사를 볼 때, 일반적으로 그것은 나쁜 일처럼 들린다.
+But there’s far more to it than the risk of whales going hungry. ## 하지만 거기에는 고래가 굶주리는 위험보다 훨씬 더 많은 것이 있다.
+Krill are a part of the ocean engine. ## 크릴은 해양 엔진의 일부이다.
+We need to understand at least some of the context before we can discuss the change and take appropriate action. ## 우리는 변화에 대해 논의하고 적절한 조치를 취할 수 있기 전에 최소한 어느 정도의 맥락은 이해할 필요가 있다.
+`],
+["23","로마의 다문화 사회",`
+Rome was said to have been a melting pot from the very start. ## 로마는 맨 처음부터 용광로였다고 일컬어졌다.
+The historian Livy claimed the city’s original population was comprised of immigrants flooding in from all directions, attracted by Romulus’s deliberate policy of nondiscrimination. ## 역사학자 Livy는 그 도시의 원래 인구가 Romulus의 의도적인 비차별 정책에 의해 이끌려 사방에서 몰려든 이민자들로 구성되었다고 주장했다.
+It was this initial openness, Livy asserts, that laid the foundations for the later strength and success of the city. ## Livy가 주장하길, 그 도시의 이후의 힘과 성공을 위한 토대를 놓은 것은 바로 이러한 초기의 개방성이었다.
+Romans described their city as multicultural in the generations after its foundation. ## 로마인들은 도시의 설립 이후 여러 세대에 걸쳐 자신들의 도시를 다문화적이라고 묘사했다.
+Tradition held that only a minority of the city’s legendary kings were Roman-born, with the others all arriving as immigrants before being chosen for the throne for their virtues and merits. ## 전통적으로, 그 도시의 전설적인 왕들 중 소수만이 로마 태생이었고, 나머지 왕들은 그들의 덕성과 공로로 왕위에 선택되기 전에 모두 이민자로 이주해 왔다고 한다.
+As the empire expanded across three continents, Rome eagerly adopted new cultural influences and absorbed incoming groups — perhaps a little too eagerly for some, who, like the poet Juvenal, complained about the rapid rate of cultural change. ## 제국이 세 대륙에 걸쳐 확장되면서, 로마는 적극적으로 새로운 문화적 영향을 채택하였고, 유입되는 집단들을 흡수했다. 이것은 아마도 어떤 사람들에게는 다소 지나치게 적극적이었을지도 모르는데, 그들은 시인 Juvenal처럼 그 급격한 문화 변화 속도에 대해 불평했다.
+`],
+["24","우주와 생명체",`
+The laws and constants of physics and the fundamental forces in our universe have very precise forms and values. ## 물리학 법칙들과 상수들 그리고 우리 우주의 근본 힘들은 매우 정밀한 공식의 형태들과 값들을 가진다.
+This means that, if they were only very slightly different, life would not have been possible. ## 이는, 만약 그것들이 아주 약간만 다르다면, 생명체가 가능하지 않았을 것임을 의미한다.
+For instance, the precise value of gravity has enabled our universe to arise by permitting the aggregation of dust and gas particles to proto-stars around which planets later came to orbit, including the Earth around the Sun. ## 예를 들어, 중력의 정밀한 값은 태양 주위의 지구를 포함하여 행성들이 나중에 그 주위를 공전하게 되는 원시 항성들로 먼지와 가스 입자들이 응집하는 것을 허용함으로써 우리 우주가 생겨나는 것을 가능하게 했다.
+If the value of the electron had been ever so slightly larger or smaller, chemistry, as we know it, would not have been possible and life, which is based on organic chemistry, could not have started. ## 만약 전자의 값이 아주 약간이라도 더 크거나 작았더라면, 우리가 알고 있는 대로의 화학 반응은 가능하지 않았을 것이며 유기 화학 반응에 기반을 둔 생명체는 시작될 수 없었을 것이다.
+The universe was not designed for us to evolve, we have no privileged position in the universe; however, the laws and constants of physics allowed advanced life to evolve. ## 우주는 우리가 진화하도록 설계되지 않았고, 우리는 우주에서 어떠한 특권적인 지위를 가지지 않는다. 그러나, 물리학 법칙들과 상수들은 고등 생명체가 진화하는 것을 가능하게 했다.
+`],
+["29","전통 음식과 건강",`
+Human beings have evolved to make the most of the resources available to them in ways that are subtle and complicated. ## 인간은 그들에게 이용 가능한 자원들을 미묘하고 복잡한 방식들로 최대한 이용하도록 진화해 왔다.
+When we change our diets, especially when we do so quickly, we are effectively conducting huge experiments in nutrition. ## 우리가 우리의 식단을 바꿀 때, 특히 우리가 매우 빠르게 그렇게 할 때, 우리는 실질적으로 영양 섭취에서 거대한 실험을 시행하고 있는 것이다.
+We ought to have more humility. ## 우리는 더 겸손해져야 한다.
+Nutritional science is still young and there is so much we do not know. ## 영양학은 여전히 역사가 짧고 우리가 모르는 것이 너무나 많다.
+If we have eaten certain foods in certain ways for millennia, we should assume until it is proven otherwise that there is probably a good reason why. ## 만약 우리가 수천 년 동안 특정한 방식들로 특정한 음식들을 먹어 왔다면, 우리는 그것이 다르게 증명될 때까지는 아마도 그렇게 하는 타당한 이유가 있을 것이라고 추측해야 한다.
+Traditional foods that don’t fit neatly on the contemporary dietary food plate should generally be chosen over highly processed ones that do. ## 일반적으로 현대의 균형 잡힌 식단의 식사에 딱 들어맞지 않는 전통 음식이 딱 들어맞는 매우 가공된 음식보다 우선 선택되어야 한다.
+We should assume that traditionally made fatty blood sausages are preferable to lean, factory-made salamis; that spoonfuls of honey are superior to sprinkles of sweeteners. ## 우리는 전통적으로 만들어진 지방이 많은 블러드 소시지가 지방이 적고 공장에서 만들어진 살라미 소시지보다 더 선호되며, 그리고 몇 스푼의 꿀이 소량의 감미료보다 더 나은 것으로 추측해야 한다.
+Witnessing how poorly traditional societies are faring as they undergo a nutrition transition should make those who have already completed it question whether their diets have moved too far. ## 전통 사회들이 영양 전환을 겪으면서 얼마나 형편없이 살아가고 있는지를 목격하는 것은 이미 그것(전환)을 완료한 이들로 하여금 자신들의 식단이 너무 멀리 간 것은 아닌지 의문을 제기하도록 만들어야 할 것이다.
+`],
+["30","윤리적인 돈 관리",`
+While convenience and technology are crucial, they are not the only factors driving Gen Z’s financial decisions. ## 편리함과 기술이 중요하지만, 그것들이 Z세대의 재정상 결정을 이끄는 유일한 요인들은 아니다.
+This generation is incredibly values-driven, and they want to bank with institutions that match their personal beliefs and values. ## 이 세대는 매우 가치 지향적이며, 개인의 신념과 가치에 부합하는 기관과 거래하기를 원한다.
+Transparency is vital. ## 투명성이 매우 중요하다.
+Gen Z is skeptical of large corporations and institutions that lack accountability. ## Z세대는 책무성이 부족한 대규모의 기업과 기관에 회의적이다.
+They have grown up in a world where information is freely available, and they expect complete transparency from the brands they support. ## 그들은 정보를 자유롭게 이용할 수 있는 세상에서 자라 왔고, 자신이 지지하는 브랜드로부터 완전한 투명성을 기대한다.
+Banks, for example, must clearly communicate fees, terms, and conditions, as well as how they handle customers’ data. ## 예를 들어, 은행은 그들이 고객의 데이터를 처리하는 방식뿐 아니라 수수료, 약관, 조항을 투명하게 전달해야 한다.
+Moreover, ethical banking practices are more important than ever. ## 게다가, 윤리적인 은행 업무는 그 어느 때보다 중요하다.
+Gen Z cares about the environment, social justice, and the ethical implications of their financial decisions. ## Z세대는 환경, 사회 정의, 그리고 자신의 재정상 결정의 윤리적 함의에 관심이 있다.
+They are interested in sustainable investing, supporting businesses that match their values, and ensuring that their money is not being used to fund harmful practices. ## 그들은 지속 가능한 투자, 자신의 가치에 부합하는 기업을 지지하는 것, 그리고 자신의 돈이 유해한 관행에 자금을 대는 데 사용되고 있지 않음을 확실히 하는 것에 관심이 있다.
+Banks that offer socially responsible investment opportunities and are committed to environmental sustainability will attract Gen Z’s attention. ## 사회적으로 책임 있는 투자 기회를 제공하고 환경적 지속 가능성에 전념하는 은행은 Z세대의 관심을 끌 것이다.
+`],
+["31","시금치와 철분",`
+Myths aren’t only stories. ## 통념은 단지 이야기가 아니다.
+For example, a well-known myth that persists today is the supposed high iron content in spinach. ## 예를 들어, 오늘날에도 지속되는 잘 알려진 하나의 통념은 시금치에 있다고 여겨지는 높은 철분 함량이다.
+This is a legend that dates back to 1890 and originates from a simple miscalculation by physiologist Gustav von Bunge. ## 이것은 1890년으로 거슬러 올라가 생리학자 Gustav von Bunge의 단순한 계산 착오에서 비롯된 전해오는 이야기이다.
+He accurately determined that 100 grams of spinach contained 35 milligrams of iron but he was analyzing dried spinach, which held ten times more iron than the same amount of fresh leafy greens. ## 그가 시금치 100그램이 철분 35밀리그램을 함유하고 있다는 사실을 정확하게 밝혀냈지만, 그는 말린 시금치를 분석하고 있었고, 그것은 같은 양의 말리지 않은 푸른잎채소(시금치)보다 열 배 많은 철분을 갖고 있었다.
+Although the error was swiftly corrected, the correction was just as swiftly forgotten. ## 그 오류는 빠르게 수정되었지만 그 수정은 그만큼 빠르게 잊혀졌다.
+The myth had taken hold. ## 이 통념은 확고히 자리를 잡았다.
+Popeye, who gained superhuman strength from the leafy greens and defended himself with iron fists, contributed to its endurance and even today, some nearly 150 years later, parents the world over use this tale to try to persuade their children into eating the healthy vegetable. ## Popeye는 푸른잎채소(시금치)에서 초인적인 힘을 얻고 강철 주먹으로 자신을 방어했기에, 그것의 지속에 기여했고, 약 150년이 지난 오늘날에도 전 세계 부모들은 자녀들이 건강한 그 채소를 먹도록 설득하기 위해 이 이야기를 이용한다.
+`],
+["32","동물의 수 세기",`
+The technical term often used to describe animals’ judgement of numbers is the approximate number system. ## 동물들의 수에 대한 분별력을 기술하는 데 자주 사용되는 전문 용어는 ‘어림 수 짐작 능력’이다.
+What it does not provide is precision. ## 그것이 제공하지 않는 것은 정확성이다.
+It shows — and this is the same in every species tested — a characteristic pattern of errors, with discrimination becoming less accurate as the quantities get bigger. ## 그것은 수량이 더 커질수록 판별이 덜 정확해지는 특징적인 오류 패턴을 보여 주는데, 이것은 실험된 모든 종에서 동일하다.
+Rhesus monkeys can tell one from two, two from three, three from four, four from five ... but start to fail from five upwards. ## 붉은털원숭이는 1과 2, 2와 3, 3과 4, 4와 5는 구별할 수 있지만, 5 위로는 실패하기 시작한다.
+Rats that learned to press a lever a given number of times, from four up to twenty-four, became markedly less and less precise in their responses as the number increased: by the top end of the range they would merely produce a spread of numbers around the target. ## 네 번에서 스물네 번까지 주어진 횟수만큼 레버를 누르도록 학습했던 쥐는 숫자가 커질수록 그들의 반응에 있어서 두드러지게 점점 덜 정확해졌다. 그 범위의 상한선에 다다랐을 때, 그들은 단지 목표(숫자) 주변에 퍼져 있는 숫자들을 산출하곤 했다.
+It is a common observation that when testing the accuracy of animals’ number sense, the size of the numbers matters. ## 동물의 수 감각의 정확성을 측정할 때, 숫자의 크기가 중요하다는 것은 공통된 관찰이다.
+`],
+["33","감정과 생각",`
+Despite the cultural trope depicting emotions as the opposite of rational thought, cognition — what we commonly refer to as thinking — is actually a key building block of emotion. ## 감정을 합리적인 사고의 반대로 묘사하는 문화적인 비유적 표현에도 불구하고, 우리가 흔히 생각이라고 일컫는 것, 즉 인지는 사실 감정의 핵심 구성 요소이다.
+How we think about our circumstances shapes the emotions we experience; then those emotions echo back to influence how we think. ## 우리가 우리의 상황에 대해 ‘생각하는’ 방식은 우리가 경험하는 감정을 형성한다. 그 다음에 그 감정들은 반향되어 우리가 생각하는 방식에 영향을 미친다.
+For instance, if you walk into a test thinking you are bad at taking tests, your anxiety will be increased. ## 예를 들어, 만약 여러분이 시험 보는 것을 잘 못한다고 생각하며 시험을 보러 걸어 들어간다면, 여러분의 불안은 증가할 것이다.
+Then you don’t feel good about your performance on the test, and that becomes evidence for continuing to think that you’re bad at test taking. ## 그러면 여러분은 그 시험에서 자신의 수행에 대해 기분이 좋지 않고, 그것은 여러분이 시험 보는 것을 잘 못한다고 ‘생각하는’ 것을 지속하는 근거가 된다.
+In this way there’s simply no pulling emotion and cognition apart. ## 이런 식으로 감정과 인지는 결코 분리할 수 없다.
+This bi-directionality of cognition and emotion allows us to adjust difficult emotions by changing the way we think. ## 인지와 감정의 이러한 양방향성은 우리가 생각하는 방식을 바꿈으로써 어려운 감정들을 조정하는 것을 가능하게 한다.
+By thinking differently — I get nervous sometimes, but I’m still a good test taker, or that nervous feeling is just excitement and anticipation, it means I’m ready — you can work those pathways to your advantage. ## ‘나는 때때로 긴장하지만, 여전히 시험 보는 것을 잘하는 사람이다.’ 혹은 ‘그 긴장되는 느낌은 단지 흥분과 기대이며, 그것은 내가 준비되었다는 것을 의미한다.’라고 다르게 생각함으로써, 여러분은 그러한 경로들을 여러분에게 유리하게 작동시킬 수 있다.
+`],
+["34","동물 보호",`
+What is the Capabilities Approach (CA), and why would lawyers passionate about animal justice care about it? ## 능력 접근법(CA)이란 무엇이며, 동물 정의에 열정을 가진 법률가들이 왜 그것에 관심을 가질까?
+It is easy to say what it is not. ## 그것이 아닌 것을 말하는 것이 쉽다.
+The CA does not rank animals by likeness to humans or seek special privileges for those considered most “like us,” as do some other popular theoretical approaches. ## CA는 다른 널리 퍼진 이론적 접근들이 그러하듯, 동물들을 인간과의 유사성에 따라 순위를 매기거나 가장 ‘우리와 비슷한’ 존재로 여겨지는 동물에게 각별한 특권을 부여하려 하지 않는다.
+The CA has concern for the finch and the pig as much as the whale and the elephant. ## CA는 고래와 코끼리에게만큼이나 핀치와 돼지에게도 관심을 가진다.
+And it argues that the human form of life is simply irrelevant when we think about what each type of animal needs and deserves. ## 그리고 그것은 우리가 각 종류의 동물이 필요로 하고 마땅히 누려야 할 것에 대해 생각할 때, 인간의 삶의 형태는 그저 무관하다고 주장한다.
+What is relevant is their own forms of life. ## 관련이 있는 것은 ‘그들 고유의’ 삶의 형태이다.
+Just as humans seek to be able to enjoy the characteristic goods of a human life, so a finch seeks a finch’s life and the whale a whale’s life. ## 꼭 인간이 인간다운 삶의 고유한 좋은 것들을 누릴 수 있기를 추구하는 것처럼, 핀치는 핀치의 삶을, 고래는 고래의 삶을 추구한다.
+We should extend ourselves and learn, not lazily picture animals as lesser humans, seeking a life sort of like our own. ## 우리는 스스로를 확장하고 배워야 하며, 동물들을 열등한 인간으로, 우리와 같은 식의 삶을 추구한다고 성의 없이 상상해서는 안 된다.
+According to the CA, each sentient creature should have the opportunity to flourish in the form of life characteristic for that creature. ## CA에 따르면, 지각 능력이 있는 각각의 생명체는 그 생명체에게 고유한 삶의 형태로 번영할 기회를 가져야 한다.
+`],
+["35","SNS와 기억력",`
+Social media serves as an important context to facilitate autobiographical remembering. ## 소셜 미디어는 자전적 기억을 촉진하는 중요한 맥락으로 작용한다.
+Personal events posted on social media platforms are better remembered and less forgotten than those not posted, independent of the characteristics of the events. ## 소셜 미디어 플랫폼에 게시된 개인적 사건들은 그 사건들의 특성과 무관하게, 게시되지 않은 것들보다 더 잘 기억되고 덜 잊힌다.
+This may be because sharing memories online allows individuals to rehearse and make sense of what happened, thus facilitating long-term memory retention. ## 이것은 온라인에서 기억을 공유하는 것이 개인이 일어난 일을 되풀이하고 이해하도록 해서 장기 기억 유지를 촉진하기 때문일 수 있다.
+Online feedback such as comments and likes as well as technological features such as algorithms and periodic reminders can further serve as memory cues for the posted event details. ## 알고리즘과 주기적인 알림과 같은 기술적 기능들뿐만 아니라, 댓글과 좋아요와 같은 온라인 피드백도 게시된 사건의 세부 사항에 대한 기억 단서로 한층 더 작용할 수 있다.
+As a result, event details shared on social media are likely stabilized and remembered over time, whereas those not shared may become inaccessible or forgotten. ## 그 결과, 소셜 미디어에 공유된 사건 세부 사항들은 시간이 지나면서 안정화되고 기억될 가능성이 높은 반면에, 공유되지 않은 것들은 접근할 수 없게 되거나 잊힐 수 있다.
+`],
+["36","오감 체험",`
+Multisensory experiences are a central part of our everyday lives, yet we often take them for granted, especially when our senses function normally or are corrected to normal with aids like glasses. ## 다중 감각 경험은 우리 일상생활의 주요한 부분이지만, 우리는 특히 감각이 정상적으로 작동하거나 안경과 같은 보조 도구로 정상으로 교정될 때 그것들을 종종 당연하게 여긴다.
+However, closer inspection to any, even the most ordinary experiences, reveals the remarkable multisensory world in which we live. ## 그러나 어떤, 심지어는 가장 평범한 경험조차 더 자세히 살펴보는 것은 우리가 살고 있는 놀라운 다중 감각 세계를 보여 준다.
+Consider the experience of eating a regular meal. ## 일상의 식사를 하는 경험을 생각해 봐라.
+At first, it may seem like an ordinary experience, but it is actually a fusion of the senses. ## 처음에는, 그것이 평범한 경험처럼 보일 수 있지만, 실제로 그것은 감각들의 융합이다.
+We first eat with our eyes, but we are also exposed to countless sensory signals that influence our eating experience such as food textures, tastes, and smells. ## 우리는 처음에는 눈으로 식사하지만, 또한 음식의 질감, 맛, 냄새와 같이 우리의 식사 경험에 영향을 미치는 수많은 감각 신호에도 노출된다.
+And it does not stop there. ## 그리고 그것은 거기서 멈추지 않는다.
+Even the sounds that come both from the atmospheres in which we eat and our interactions with the food (such as chewing) and the tools we use to eat influence our eating experience. ## 심지어 우리가 식사하는 상황과, 음식(씹기)이나 우리가 식사에 사용하는 도구와의 상호 작용 둘 다에서 나오는 소리들도 우리의 식사 경험에 영향을 미친다.
+`],
+["37","반대말 학습",`
+As children, the principle of opposites is foreign. ## 어릴 때, 반대의 원리는 낯설다.
+Children perceive words and their meanings separately from each other. ## 아이들은 단어들과 그 의미들을 서로 분리해서 인식한다.
+It is only in later development that we understood that individual words directly connect to one another. ## 우리가 개별 단어들이 직접적으로 서로 연결되어 있다는 것을 이해하게 되는 것은 나중의 발달 단계가 되어서이다.
+For many children, for instance, it is not clear that ‘Right’ is the opposite of ‘Left’. ## 예를 들어, 많은 아이들에게, ‘오른쪽’이 ‘왼쪽’의 반대라는 것은 분명하지 않다.
+A vivid example of this can be seen when children learn to ride a bicycle. ## 이것의 생생한 사례는 아이들이 자전거 타는 것을 배울 때 보여질 수 있다.
+If parents tell their child “Don’t go to the left,” they will often find that the child will continue riding straight ahead and not automatically turn to the right. ## 부모들이 자녀에게, “왼쪽으로 가지 마.”라고 말하면, 부모는 아이가 곧장 앞으로 계속 가고 자동적으로 오른쪽으로 방향을 틀지 않는 것을 종종 보게 될 것이다.
+The same applies to the logical connection between ‘Yes’ and ‘No’ as perceived by parents. ## 같은 원리가 부모가 인식하는 ‘예’와 ‘아니요’ 사이의 논리적 관계에도 적용된다.
+When we were children and were told, for example, “No, don’t eat with your hands,” we were confused and didn’t know what our parents expected from us. ## 우리가 아이였을 때, 예를 들어, “안 돼, 손으로 먹지 마.”라는 말을 들었을 때, 우리는 혼란스러웠고, 우리 부모가 우리로부터 기대하는 것이 무엇인지 몰랐다.
+Our confusion was about whether we should continue eating or not and if so, how? ## 우리의 혼란은 계속 먹어야 하는 건지 아닌지, 만약 먹는다면 어떻게 해야 하지?에 대한 것이었다.
+Only later did we recognize the connection and understand that we should continue eating, but not with our hands but with a fork or a spoon. ## 나중에서야 우리는 그 연관성을 인식했고, 우리가 손이 아니라 포크나 숟가락으로 계속 먹어야 한다는 것을 이해하게 되었다.
+`],
+["38","인간의 사회생활",`
+Humans are not the most social animal. ## 인간이 ‘가장’ 사회적인 동물은 아니다.
+Ants, bees, and termites put humanity to shame on many metrics of sociality. ## 개미, 벌, 그리고 흰개미는 많은 사회성 측정 기준에서 인류를 부끄럽게 한다.
+A wide variety of relatives live together with perfectly harmonious behavior and collectively care for their young. ## 매우 다양한 동족들이 완벽하게 조화로운 행동으로 함께 살고 집단적으로 그들의 어린 새끼들을 돌본다.
+But while insect colonies are impressively social places, it’s not our kind of social life. ## 그러나 곤충 군집들이 인상적으로 사회적인 장소인 반면, 그것은 ‘우리의’ 사회생활의 종류가 아니다.
+Bees always build hexagonal hives, ants march in lines, and termites move in zigzag formations. ## 벌들은 항상 육각형의 벌집을 짓고, 개미들은 줄지어 행진하며, 흰개미들은 지그재그 대형으로 움직인다.
+These patterns recur predictably because they are tightly programmed genetically and propelled pheromonally. ## 이러한 패턴들은 그것들이 유전적으로 긴밀하게 프로그램 되어 있으며 페로몬에 의해 추진되기 때문에 예측할 수 있게 반복된다.
+We humans are more free, less tightly programmed genetically, so our social patterns can be more diverse and dynamic. ## 우리 인간은 더 자유롭고, 유전적으로 덜 긴밀하게 프로그램 되어 있어서 우리의 사회적 패턴들은 더 다양하고 역동적일 수 있다.
+Every group dances a slightly different dance, and these choreographies change across generations. ## 모든 집단은 약간 다른 춤을 추는데 이러한 안무들은 세대에 걸쳐 변한다.
+We still think and act in ways that are in harmony with others around us, but it is through patterns that are more shaped by nurture, not just nature. ## 우리는 여전히 우리 주변의 다른 사람들과 조화를 이루는 방식으로 생각하고 행동하지만, 그것은 단지 본성만이 아니라 양육에 의해 더 많이 형성되는 패턴들을 통해서이다.
+`],
+["39","유행과 소비",`
+Those who purchase the goods of a company are called customers. ## 어떤 회사의 상품을 구매하는 사람들은 고객이라 불린다.
+Individuals who purchase goods for personal use are called consumers: beings who consume. ## 개인적인 용도로 상품을 구매하는 사람들은 소비자, 즉 소비하는 존재라 불린다.
+Therefore, companies have invented multiple ways to ensure that their customers consume the produced items in larger and larger quantities and more and more frequently. ## 따라서, 기업들은 그들의 고객이 생산된 물품을 반드시 점점 더 많이 점점 더 자주 소비하게 하기 위한 다양한 방법들을 고안해 왔다.
+Those who sell food have an easy time, for food is literally consumed, so there is always a need to purchase new food. ## 음식을 판매하는 사람들은 수월한 편인데, 왜냐하면 음식은 말 그대로 소비되므로, 새로운 음식을 구매할 필요는 항상 있기 때문이다.
+But with more permanent things, companies must invent reasons for their customers to continue to consume them. ## 그러나 보다 영구적인 물건의 경우, 기업들은 고객이 그것들을 계속 소비할 이유를 만들어 내야 한다.
+One approach is to make the stuff that people already have outdated by convincing them that it is no longer fashionable. ## 한 가지 접근법은 사람들이 이미 가지고 있는 물건이 더 이상 유행하지 않는다고 설득하여 그것을 구식이 되게 하는 것이다.
+The entire fashion industry is built to convince people that fashion matters, so they must purchase new clothing, even though the old is still perfectly functionable. ## 전체 패션 산업은 기존 옷이 여전히 완벽하게 기능하더라도, 유행이 중요하고 그래서 그들이 새 옷을 사야 한다고 사람들을 설득하기 위해 만들어져 있다.
+Fashion today extends to far more things than clothes: automobiles, mobile phones, computers — the list is extended indefinitely, limited only by the limits of the creative minds of the marketing divisions of companies. ## 오늘날 유행은 옷을 넘어 자동차, 휴대 전화, 컴퓨터 등 훨씬 많은 것들로 확장된다. 그 목록은 끝없이 확장되며, 다만 기업에 속한 마케팅 부서의 창의적 사고의 한계에 의해서만 제한될 뿐이다.
+`],
+["40","포인트 적립 효과",`
+Kivetz, Urminsky, and Zheng partnered with a café to test the motivating effect of illusory progress in an experiment. ## Kivetz, Urminsky, Zheng은 착각된 진전이 주는 동기 부여 효과를 실험에서 시험해 보기 위해 한 카페와 협력했다.
+Customers received a reward card that offered one free coffee after they’d bought ten. ## 고객들은 열 잔을 산 후에 무료 커피 한 잔을 제공하는 보상 카드를 받았다.
+While half of the customers received a card with ten open slots, the other half got a card with twelve open slots. ## 고객들 중 절반은 열 개의 빈칸이 있는 카드를 받은 반면에, 나머지 절반은 열두 개의 빈칸이 있는 카드를 받았다.
+Yet the twelve-slot card had two preexisting “bonus” stamps, so, strictly speaking, these were identical reward programs. ## 하지만 열두 칸짜리의 카드에는 이미 찍힌 두 개의 ‘보너스’ 도장이 있어서, 엄밀히 말하면, 이것들은 동일한 보상 프로그램이었다.
+Every customer who got a card needed to make ten coffee purchases (and collect ten stamps) to get their free coffee. ## 카드를 받은 모든 고객은 무료 커피를 받기 위해 열 잔의 커피를 구매해야 (그리고 도장 열 개를 모아야) 했다.
+But the appeal of the free stamps was high. ## 하지만 무료 도장의 매력은 컸다.
+People who thought they’d gotten a head start came back to the café more often, filling in their reward card more quickly than the others. ## 자신이 앞선 출발을 했다고 생각한 사람들은 카페에 더 자주 돌아왔고, 다른 사람들보다 더 빨리 그들의 보상 카드를 채웠다.
+When the card came with two out of twelve slots already filled, it felt to customers like they were already 16 percent finished with the goal before they’d even started. ## 열두 칸 중 두 칸이 이미 채워진 채로 카드가 손에 들어왔을 때, 그것은 고객들에게 시작도 하기 전에 이미 목표의 16퍼센트를 끝낸 것처럼 느껴졌다.
+Believing they were closer to the reward, they were more motivated to reach the finish line. ## 자신들이 보상에 더 가까워졌다고 믿었기 때문에, 그들은 결승선에 도달하는 데 더 큰 동기를 부여받았다.
+According to the study above, customers were more driven to complete their goals when they perceived the reward as nearer. ## 위의 연구에 따르면, 고객들은 보상이 더 가깝다고 인식했을 때 그들의 목표를 완수하도록 더 동기 부여되었다.
+`],
+["41~42","AI와 인간의 창의력",`
+Creativity is the ability to generate novel and valuable ideas. ## 창의성이란 새롭고 가치 있는 아이디어를 만들어 내는 능력이다.
+It involves divergent thinking, imagination, and a willingness to experiment and take risks. ## 그것은 확산적 사고, 상상력, 그리고 실험을 하고 위험을 감수하려는 의지를 포함한다.
+While AI can be a powerful tool for creative efforts, it also carries the risk of limiting originality and innovation. ## AI는 창의적인 노력을 위한 강력한 도구가 될 수 있지만, 또한 독창성과 혁신을 제한할 위험을 수반한다.
+AI algorithms are trained on existing datasets, often identifying patterns and trends in past creations. ## AI 알고리즘은 종종 과거의 창작물에서 패턴과 경향을 식별하며 기존의 데이터 세트를 바탕으로 훈련된다.
+While this can be useful for generating new content in similar styles or formats, it can also lead to derivative works that lack genuine originality. ## 이것은 유사한 스타일이나 형식으로 새로운 콘텐츠를 만들어 내는 데 유용할 수 있지만, 그것은 또한 진정한 독창성이 부족한 모방적인 작품들로 이어질 수 있다.
+If artists and designers rely too heavily on AI for inspiration and content generation, they may find themselves trapped in a cycle of imitation, unable to break free from the constraints of the AI’s training data. ## 예술가와 디자이너가 영감과 콘텐츠 생성을 위해 AI에 지나치게 의존한다면, 그들은 AI의 훈련 데이터라는 제한으로부터 벗어날 수 없는 상태에서 모방의 순환에 갇힌 자신을 발견할지 모른다.
+Moreover, the ease with which AI can generate content can discourage the kind of struggle and experimentation that often leads to breakthroughs. ## 더욱이, AI로 콘텐츠를 생성할 수 있는 편의성은 종종 획기적인 발전으로 이어지는 그런 종류의 노력과 실험을 방해할 수 있다.
+The creative process is often messy and repetitive, involving numerous failures and setbacks. ## 창의적인 과정은 종종 골치 아프고 반복적이며 수많은 실패와 좌절을 수반한다.
+It is through these challenges that we refine our skills, develop our unique perspectives, and push the boundaries of what is possible. ## 우리가 자신의 기술을 연마하고, 고유한 관점을 발전시키며, 가능한 것의 경계를 넓혀가는 것은 바로 이러한 어려움들을 통해서이다.
+If AI provides instant solutions, it can bypass this essential process of learning through trial and error, ultimately inhibiting the development of true creative talent. ## 만약 AI가 즉각적인 해결책을 제공한다면, 그것은 시행착오를 통한 이 본질적인 학습 과정을 건너뛸 수도 있으며, 궁극적으로는 진정한 창의적 재능의 발달을 방해한다.
+`]
+],
+"모고26": [
+["18","직장인 교육",`
+Dear Ms. Palmer, ## Ms. Palmer 귀하
+My name is Karen Whitfield, a marketing assistant in the marketing department. ## 제 이름은 Karen Whitfield이며, 마케팅 부서의 마케팅 보조원입니다.
+As part of my efforts to contribute more to the department, I would like to receive additional training to further develop my skills. ## 부서에 더 많이 기여하기 위한 제 노력의 일환으로서, 저는 제 능력을 더욱 향상시키기 위해 추가적인 연수를 받고 싶습니다.
+Over the last quarter, I noticed our department needs to better attract potential customers for our products online. ## 지난 분기 동안, 저는 우리 부서가 우리 제품의 잠재 고객들을 온라인에서 더 잘 끌어들일 필요가 있다는 것을 알아차렸습니다.
+For this reason, I’m requesting that the company cover part of my training cost. ## 이러한 이유로, 저는 회사가 제 연수 비용의 일부를 지원해 줄 것을 요청합니다.
+I have recently searched for training courses and found Smart Growth Training’s two-week course that focuses on digital marketing strategies. ## 최근에 저는 연수 과정들을 찾아보았고, 디지털 마케팅 전략에 초점을 맞춘 Smart Growth Training의 2주짜리 과정을 발견했습니다.
+It costs $1,600, and I strongly believe it would be helpful for my current work. ## 그것은 1,600달러의 비용이 들며, 저는 그것이 저의 현재 업무에 도움이 될 것이라고 강하게 믿습니다.
+I hope you will consider my request positively. ## 저는 귀하께서 제 요청을 긍정적으로 고려해 주기를 바랍니다.
+`],
+["19","방학 중 학교 과제",`
+It was the last day of school before summer vacation. ## 여름 방학 전 학교에서의 마지막 날이었다.
+After months of quizzes and assignments, I couldn’t wait to leave everything behind. ## 몇 달간의 퀴즈와 과제 후에, 나는 모든 것을 뒤로하고 빨리 떠나고 싶었다.
+Could anything be sweeter? ## 어떤 것이 더 달콤할 수 있을까?
+I practically danced while cleaning out my locker, and nothing could ruin my mood. ## 나는 내 사물함을 정리하면서 거의 춤을 추다시피 했고, 어떤 것도 내 기분을 망칠 수 없었다.
+As I zipped up my backpack, ready to leave, my science teacher, Mr. Manta, called me aside. ## 내가 책가방을 잠그고 떠날 준비를 할 때, 과학 선생님인 Manta 선생님이 나를 따로 불렀다.
+“Rafe,” he said, “you haven’t turned in your final lab report, despite all my warnings this past month.” ## “Rafe.” 그가 말했다. “지난 한 달간 내 모든 경고에도 불구하고 너는 네 최종 실험 보고서를 제출하지 않았구나.”
+The words hit me like cold water. ## 그 말은 찬물을 끼얹듯이 나에게 충격을 줬다.
+He was right, but I totally forgot about it. ## 그의 말이 맞았지만 나는 그것에 대해 완전히 잊고 있었다.
+“To make up for it, you must attend summer school,” he added. ## “그것을 보충하려면, 너는 여름 학교에 출석해야 해.” 그가 덧붙여 말했다.
+Instead of lazy mornings and endless free time, I’d be spending my vacation at a lab table — the last thing I wanted to do with my precious summer. ## 여유로운 아침과 끝없는 자유 시간 대신에, 나는 실험대에서 방학을 보내게 되겠지. 이것은 내 소중한 여름에 내가 가장 하고 싶지 않은 것이었다.
+`],
+["20","세계 시민 의식",`
+We might not think of ourselves as global citizens yet, but it’s both necessary and possible to do so. ## 우리는 아직 우리 자신을 세계 시민이라고 생각하지 않을 수도 있지만, 그렇게 생각하는 것은 필요하면서도 가능하기도 하다.
+Some people are skeptical about the idea of global citizenship, but for most of human history, people didn’t think of themselves as citizens of nation-states. ## 어떤 사람들은 세계 시민이라는 개념에 대해 회의적이지만, 인류 역사 대부분의 기간 동안 사람들은 자기 자신을 국민 국가의 시민이라고 생각하지 않았다.
+After all, for most of human history, nation-states didn’t exist. ## 어쨌든, 인류 역사 대부분의 기간 동안 국민 국가는 존재하지 않았다.
+The rise of nation-states over the last few centuries has led people to add state citizenship to other identities, such as family, people group, or religion. ## 지난 몇 세기에 걸친 국민 국가의 부상은 사람들로 하여금 가족, 민족 집단, 혹은 종교와 같은 다른 정체성들에 국가 시민 정체성을 더하게 만들었다.
+Given the connections between people around the world and the common challenges we face, we need to layer global citizenship on to these other identities. ## 전 세계 사람들 간의 연결과 우리가 직면한 공통 과제들을 고려할 때, 우리는 이러한 다른 정체성들 위에 세계 시민 정체성을 쌓을 필요가 있다.
+This doesn’t mean that global citizenship replaces these other identities. ## 이것이 세계 시민 정체성이 이러한 다른 정체성들을 대체한다는 것을 의미하지는 않는다.
+There’s not a single story about our identities. ## 우리의 정체성들에 관한 단 하나의 이야기가 있는 것은 아니다.
+Instead, it’s precisely because we have obligations to our families, those in our community, and those around the world. ## 오히려, 그것은 정확하게는 우리가 우리의 가족, 공동체 내의 사람들, ‘그리고’ 전 세계 사람들에 대한 의무를 지니고 있기 때문이다.
+`],
+["21","직업과 경력 변화",`
+Among unsatisfied professionals, there’s a repeating theme — the belief that someday (a mysterious day in the future) things will miraculously change and they’ll stumble into the perfect job or career. ## 만족하지 못하는 직업인들 사이에는 되풀이해서 나타나는 주제가 있다. 그것은 언젠가 (미래의 알 수 없는 날에) 상황이 기적적으로 바뀌어 자신들이 우연히 완벽한 일자리나 경력을 마주칠 것이라는 믿음이다.
+At the same time, they (typically) do little to meaningfully alter their current situation. ## 그러면서도 그들은 (대체로) 자신의 현재 상황을 의미 있게 바꾸기 위해 하는 일이 거의 없다.
+They don’t like their job, so what do they do? ## 그들이 자신의 일자리를 좋아하지 않는데, 그래서 그들은 무엇을 하는가?
+They head to job boards and search for roles with a similar job title, hoping that the universe will sprinkle a bit of magic on their career if they just hit the refresh button in a different department or company. ## 그들은 구인란으로 가서 비슷한 직책의 일자리를 검색하고, 그들이 다른 부서나 회사에서 그저 새로 고침 버튼만 누르면 우주가 자신의 경력에 약간의 마법 가루를 뿌려 주기를 바란다.
+Efforts like this make professionals feel like they are doing something, when really they’re just setting themselves up to take a new role and quickly become just as disenchanted as they were before. ## 이와 같은 노력은 직업인들로 하여금 자신들이 무언가를 하고 있는 것처럼 느끼게 하지만, 그때 실제로 그들은 단지 새로운 일자리를 구한 뒤 그들이 이전에 그랬던 것처럼 빠르게 환상이 깨질 상황에 스스로를 처하게 할 뿐이다.
+It’s like rearranging deck chairs on the Titanic. ## 이는 타이타닉호의 갑판 의자들을 재배치하는 것과 같다.
+You’ve got to completely switch up your approach. ## 여러분은 자신의 접근 방식을 완전히 바꾸어야 한다.
+If you keep playing the same game, you’ll win the same prizes. ## 여러분이 계속해서 같은 게임을 한다면, 똑같은 보상을 얻게 될 것이다.
+`],
+["22","시간에 대한 인식",`
+Sociologists argue that our perception and usage of time are not just basic properties of nature, like a clock ticking away in the background, nor are they simply psychological phenomena of individual experience. ## 사회학자들은 시간에 대한 우리의 인식과 시간 사용이 배경에서 째깍거리며 흘러가는 시계처럼 단순히 자연의 기본적인 속성도 아니고, 단순히 개인적 경험의 심리적 현상도 아니라고 주장한다.
+Instead, how we perceive and understand time is to a large degree shaped by tradition and cultural norms. ## 오히려 우리가 시간을 인식하고 이해하는 방식은 상당한 정도로 전통과 문화적 기준에 의해 형성된다.
+Eviatar Zerubavel’s work, The Seven Day Circle: The History and Meaning of the Week, demonstrates how the week, a fundamental unit of time, is a social invention that varies across cultures, influencing how people structure their activities and rhythms of life. ## Eviatar Zerubavel의 저서인 The Seven Day Circle: The History and Meaning of the Week는 어떻게 시간의 기본 단위인 일주일이 사람들이 그들의 활동과 삶의 리듬을 구조화하는 방식에 영향을 끼치면서 문화마다 다른 사회적 발명품인지를 보여 준다.
+Why do we consider a nine-to-five job routine? ## 왜 우리는 9시부터 5시까지 일하는 직업을 일상적인 것으로 여기는가?
+Why don’t many of us work on the weekends? ## 왜 우리 중 많은 사람은 주말마다 일하지 않는가?
+Why do we usually pay our bills at the end of the month? ## 왜 우리는 대개 월말에 고지 금액을 납부하는가?
+Why is the retirement age sixty-five? ## 왜 은퇴 연령은 65세인가?
+These numbers and patterns aren’t really dictated by nature or any essential human characteristic, but are rather social creations that we internalize and come to accept as “normal.” ## 이러한 숫자와 양식은 실제로 자연이나 인간의 어떤 본질적인 특성에 의해 좌우되는 것이 아니라, 오히려 우리가 내면화하여 결국 ‘기준’으로 받아들이게 된 사회적 창조물이다.
+`],
+["23","내부 고발자 보호",`
+In recent years, the number of illegal actions in particular at the corporate level has grown, or at least the number of cases that came to light, increased. ## 최근 몇 년 동안 특히 기업 차원에서 발생하는 위법 행위의 수가 증가했거나, 적어도 세상에 드러난 사건의 수가 증가했다.
+Such misconduct has often only been exposed because brave informants have risked a great deal in order to put an end to it. ## 그러한 위법 행위는 용기 있는 제보자들이 그것을 끝내기 위해 많은 위험을 무릅써 왔기 때문에 비로소 종종 드러났다.
+Hence, it is no surprise that whistleblower protection has come into focus. ## 따라서 내부 고발자 보호가 주목받게 된 것은 놀라운 일이 아니다.
+If violations of law and order go undetected and unpunished for years because employees of a company fear to report illegal activities for fear of reprisals or consequences, it can have several negative effects. ## 기업의 직원들이 보복이나 불이익을 두려워하여 위법 행위를 신고하기를 꺼려서 법과 질서의 위반이 여러 해 동안 적발되지도 처벌받지도 않는다면, 그것은 여러 가지 부정적인 영향을 미칠 수 있다.
+It can harm the company itself, but also third-parties, the economy in general, the general public, and even the rule of law could be affected. ## 그것은 해당 기업 자체에 해를 끼치지만 또한 제삼자, 경제 전반, 일반 대중, 심지어 법치주의마저도 영향을 받을 수 있다.
+Protecting those who would assist in reducing unlawful or even criminal behaviour has two main functions: Protecting the individual’s actions as well as protecting the public good. ## 위법하거나 심지어 범죄인 행위를 줄이는 데 도움을 주려는 사람들을 보호하는 것은 두 가지 주요 기능을 지닌다. 즉, 그 사람의 행위를 보호하는 것과 공익을 보호하는 것이다.
+A well-balanced whistleblower protection may have positive effects on both of these. ## 균형이 잘 잡힌 내부 고발자 보호는 이 두 가지 모두에 긍정적인 영향을 미칠 수 있다.
+`],
+["24","긍정적인 생각의 부작용",`
+Unfortunately, sometimes the idea of a goal is disconnected from the daily reality of what it will take to achieve it. ## 안타깝게도 목표에 대한 상상은 때때로 그것을 달성하기 위해 요구되는 것의 일상적인 현실로부터 동떨어져 있다.
+We fall in love with the idea of a goal, pushing out of mind how different our day-to-day will need to be for us to make it happen. ## 우리는 목표에 대한 ‘상상’과 사랑에 빠져, 우리가 그것을 실현하기 위해서 우리의 하루하루가 얼마나 달라져야 할지를 생각에서 밀어낸다.
+In fact, research even suggests that positive fantasies about our future can lead us to put less effort into our goals because our fantasies provide us with a false and premature sense of accomplishment. ## 실제로, 연구는 심지어 우리의 환상이 우리에게 거짓되고 때 이른 성취감을 주기 때문에 우리의 미래에 대한 긍정적 환상이 우리가 우리의 목표에 노력을 ‘덜’ 기울이게 할 수 있다는 것을 시사한다.
+We romanticize a goal — falling in love with the idea of a change. ## 우리는 목표를 낭만화한다. 즉, 변화에 대한 상상과 사랑에 빠진다.
+In the process, we gloss over the intricacies and challenges of integrating a complex new behavior into our life. ## 그 과정에서 우리는 복잡한 새로운 행동을 우리의 삶에 통합하는 것의 복잡함과 어려움에 대해 얼버무리고 넘어간다.
+As one study nicely summed it up, fantasizing about a positive future “seduces a person to mentally enjoy the desired future in the here and now” — and because we don’t reflect on why our fantasy is not yet our future, “a necessity to act is not induced.” ## 한 연구가 이를 잘 요약했듯이, 긍정적인 미래에 대하여 환상을 품는 것은 “사람을 현혹시켜 원하는 미래를 지금 여기에서 머릿속으로 즐기게 한다.” 그래서 우리가 우리의 환상이 아직 우리의 미래가 아닌 ‘이유’에 대해 돌아보지 않기 때문에 “행동해야 할 필요가 유발되지 않는다.”
+`],
+["29","노화와 영원한 생명",`
+Since hydra and the immortal jellyfish don’t exhibit obvious signs of aging, they are often called biologically immortal. ## 히드라와 불멸의 해파리는 명백한 노화의 징후들을 보이지 않기 때문에, 그것들은 흔히 생물학적으로 죽지 않는다고 여겨진다.
+This doesn’t mean they don’t die. ## 이는 그것들이 죽지 않는다는 것을 의미하지는 않는다.
+Nor does it even mean that they cannot die of biological causes. ## 심지어 그것들이 생물학적 원인으로 죽을 ‘수 없다’는 것을 의미하는 것도 아니다.
+But, unlike most every animal, their likelihood of dying does not increase with age. ## 하지만, 대부분의 모든 동물과 달리, 그것들이 죽을 가능성은 나이가 들면서 증가하지 않는다.
+Species such as hydra and the immortal jellyfish excite gerontologists because they may provide clues about how to defeat the aging process. ## 히드라와 불멸의 해파리와 같은 종들은 그것들이 노화 작용을 물리치는 방법에 관한 단서들을 제공할지도 모르기 때문에 노화학자들을 흥분시킨다.
+But their property of being able to regenerate entire body parts, or even a whole organism, makes them more similar to trees than to us. ## 하지만 전체 신체 부위나 심지어는 한 생물체 전체를 재생할 수 있는 그것들의 특성은 그것들을 우리보다는 나무들과 더 유사하게 만든다.
+Although we may learn some fascinating things about their lack of apparent aging, it is not at all clear how relevant those findings will be to human aging. ## 비록 우리가 그것들의 명백한 노화의 결여에 관한 몇 가지 흥미로운 사실들을 알게 될 수 있을지라도, 그러한 발견들이 인간의 노화에 얼마나 관련이 있을지는 전혀 명확하지 않다.
+Sometimes biology is universal, especially if it relates to fundamental mechanisms. ## 때때로 생명 작용은 보편적인데, 특히 그것이 근본적인 메커니즘과 관련이 있다면 그러하다.
+But in other cases, even discoveries in rats or mice, which are mammals and biologically much closer to us, are difficult to translate into humans. ## 하지만 다른 경우들에서는, 포유류이며 생물학적으로 우리에게 훨씬 더 가까운, 쥐나 생쥐에서의 발견들조차도 인간에게 적용하기가 어렵다.
+It may be a very long time before any findings gained from hydra or jellyfish are useful to us. ## 히드라나 해파리로부터 얻은 어떠한 발견들도 우리에게 유용해지기까지는 매우 오랜 시간이 걸릴지도 모른다.
+`],
+["30","정부 보조금의 문제",`
+Subsidies, taxes, and regulations can all lead to power plants that pollute less by switching away from coal. ## 보조금, 세금, 그리고 규제는 모두 석탄에서 (다른 에너지원으로) 전환함으로써 오염을 덜 일으키는 발전소로 이어질 수 있다.
+In all cases, profits can be higher from making the transition, even taking the related costs into account. ## 모든 경우에, 관련된 비용까지 고려하더라도, 그러한 전환을 하는 것으로부터 얻는 이익은 더 높을 수 있다.
+The power plants prefer subsidies over regulations or taxes. ## 발전소들은 규제나 세금보다 보조금을 선호한다.
+The reason is obvious. ## 이유는 명백하다.
+They prefer to receive money from the government rather than pay the costs themselves. ## 그들은 그 비용을 자신들이 직접 지불하기보다는 정부로부터 돈을 받는 것을 선호한다.
+But the “expansion” of their opportunity set through subsidies has to be matched by the contraction of the opportunity set of others. ## 그러나 보조금을 통한 그들의 기회 집합의 ‘확대’는 다른 사람들의 기회 집합의 축소에 의해 맞추어져야 한다.
+The electricity companies’ “freedom” is increased at the expense of the ordinary individual, who must suffer from increased taxation to pay for the subsidy. ## 전력 회사들의 ‘자유’는 일반 개인을 희생시켜 증가하는데, 이들은 보조금을 지급하기 위해 늘어난 세금으로 인해 고통을 겪어야 한다.
+Moreover, from the perspective of pure efficiency, the subsidy distorts the economy because the electricity company is not facing the full costs of what it does, even if it is successful in limiting emissions. ## 더욱이 순수한 효율성의 관점에서, 보조금은 전력 회사가 비록 배출량을 제한하는 데 성공하더라도 그것이 하는 것의 전체 비용을 직면하지 않기 때문에 경제를 왜곡한다.
+Indeed, electricity prices may end up lower than they should be and electricity consumption higher, which will worsen global warming, even though the emissions per unit of electricity have been reduced. ## 실제로 전기 가격은 그래야 하는 것보다 결국 더 낮아질 수 있고 전기 소비는 더 높아질 수 있으며, 이는 비록 전기 단위당 배출량은 감소했을지라도 지구 온난화를 더욱 악화시킬 것이다.
+`],
+["31","기술 발전과 자원 부족",`
+Few people may view the Star Trek universe through an economic lens, but doing so provides a window into a world that might soon be upon us. ## Star Trek의 세계를 경제학적 관점을 통해 바라보는 사람은 거의 없을지 모르지만, 그렇게 하는 것이 곧 우리에게 닥칠지도 모르는 세계를 들여다볼 수 있는 창을 제공한다.
+All of classical economics is based on the notion that there isn’t usually enough of anything to give everyone everything they want or need. ## 고전 경제학 전체는 모든 사람에게 그들이 원하거나 필요로 하는 모든 것을 제공하기에는 대체로 어떤 것이든 충분하지 않다는 개념에 기초하고 있다.
+Because of that, we use markets and pricing to allocate those goods, services, and resources to where they might result in the highest benefit. ## 그 때문에 우리는 그러한 재화와 서비스 및 자원을 그것들이 가장 큰 이익을 낳을 수 있는 곳에 배분하기 위해 시장과 가격 책정을 이용한다.
+In Star Trek, however, there isn’t much scarcity. ## 그러나 Star Trek에서는 희소성이 별로 없다.
+Technology has allowed that society to reproduce any food they want, transport themselves thousands of miles in the blink of an eye, communicate over light-years, and travel among the stars. ## 기술은 그 사회가 그들이 원하는 어떤 음식이든 복제하고, 눈 깜짝할 사이에 그들 자신을 수천 마일 이동시키며, 수 광년의 거리를 넘어 의사소통하고, 별들 사이를 여행할 수 있게 해 왔다.
+All of humanity in that world has been fully educated so that they can participate in this prosperity. ## 그 세계의 모든 인류는 이러한 풍요로움에 참여할 수 있도록 충분히 교육을 받아 왔다.
+Everyone is an explorer, researcher, engineer, artist, doctor, or counselor. ## 모든 사람은 탐험가, 연구원, 기술자, 예술가, 의사 또는 상담사이다.
+Generative AI has the potential to allow many dimensions of our own society to be similarly highly abundant. ## 생성형 AI는 우리 사회의 많은 측면이 마찬가지로 매우 풍요로워질 수 있게 할 잠재력을 지니고 있다.
+`],
+["32","경청의 외적 신호",`
+People, whether customers or otherwise, want to feel heard. ## 사람들은, 고객이든 그렇지 않든, 경청 받고 있다고 느끼기를 원한다.
+When someone calls customer service, asks to speak to a manager, or comes into your office with something on their mind, they want to feel like someone is listening to their concerns and going to address them. ## 누군가가 고객 서비스 센터에 전화를 하거나, 관리자와 이야기하기를 요청하거나, 마음에 어떤 생각을 품은 채 여러분의 사무실로 찾아올 때, 그들은 누군가가 자신의 우려 사항에 귀를 기울이고 그것을 해결해 줄 것처럼 느끼기를 원한다.
+But for someone to feel heard, three things have to happen. ## 그러나 누군가가 경청 받고 있다고 느끼기 위해서는, 세 가지가 이루어져야 한다.
+First, they have to feel like the other person paid attention to what they said. ## 첫째, 그들은 상대방이 자신들이 말한 것에 주의를 기울인 것처럼 느껴야 한다.
+Second, they have to feel like the other person understood what they said. ## 둘째, 그들은 상대방이 자신들이 말한 것을 이해한 것처럼 느껴야 한다.
+And third, the other person has to demonstrate that they listened. ## 그리고 셋째, 상대방은 자신이 귀를 기울였다는 것을 보여 줘야 한다.
+This last part is key. ## 이 마지막 부분이 핵심이다.
+Imagine talking to someone who provided no response. ## 아무런 반응도 보여 주지 않는 사람과 이야기한다고 상상해 보라.
+They might have attended to everything we said. ## 그들은 우리가 말한 모든 것에 주의를 기울였을지도 모른다.
+They might even have understood it completely. ## 그들은 심지어 그것을 완전히 이해했을지도 모른다.
+But without some sort of outward signal that indicates they listened, it’s impossible to know whether or not they actually did. ## 그러나 그들이 귀를 기울였음을 보여 주는 어떤 종류의 외적인 신호가 없이는, 그들이 실제로 그렇게 했는지 아닌지를 아는 것은 불가능하다.
+`],
+["33","장소가 경험에 미치는 영향",`
+The very fact that all of our experiences “take place” in a physical space makes the space inseparable from what defines it, from the event that took place in it. ## 우리의 모든 경험이 물리적 공간에서 ‘일어난다’는 바로 그 사실은, 그 공간을 그것을 규정하는 것, 즉 그 공간 ‘안’에서 일어난 사건으로부터 분리될 수 없게 만든다.
+The tree and the ground beneath are inseparable from what took place there. ## 그 나무와 그 아래의 땅은 그곳에서 일어난 일과 분리될 수 없다.
+This intertwining of space, place, and experience challenges the idea of place as passive backdrop. ## 공간, 장소, 그리고 경험의 이러한 뒤얽힘은 수동적 배경으로서의 장소라는 개념에 이의를 제기한다.
+If place and space are central to the very heart of experience, we must accept the possibility that the spatial framework is the medium of all experiences — actions, thoughts, memories, and feelings of every place — not merely a background or context exterior to experience (as commonly supposed). ## 만약 장소와 공간이 경험의 바로 그 핵심의 중심이라면, 우리는 공간적 틀이 모든 경험, 즉 모든 장소에서의 행동, 생각, 기억, 그리고 감정의 매개체이며, (일반적으로 생각되는 것처럼) 단지 경험의 외부에 있는 배경이나 상황이 아니라는 가능성을 받아들여야 한다.
+Belgian literary critic Georges Poulet made the point elegantly, writing of the space created in Marcel Proust’s great novel In Search of Lost Time: “Beings surround themselves with the places where they find themselves, the way one wraps oneself up in a garment that is at one and the same time a disguise and a characterization. ## 벨기에의 문학 평론가 Georges Poulet는 Marcel Proust의 위대한 소설 In Search of Lost Time에서 창조된 공간에 대해 다음과 같이 쓰면서 그 점을 유려하게 말했다. “존재들은 자신들을 발견하게 되는 장소들로 스스로를 둘러싸는데, 이는 어떤 사람이 변장인 동시에 그 사람을 특징짓는 것이기도 한 의복으로 자신을 감싸는 것과 같다.
+Without places, beings would be only abstractions.” ## 장소가 없다면, 존재들은 단지 추상적 개념에 불과할 것이다.”
+`],
+["34","진화에 대한 연구",`
+No matter how you choose to delineate your evolutionary system of interest — let’s say it’s cell phones — there will be some things that your model just needs to take as a given, such as the fact that new ideas emerge at particular times. ## 여러분이 관심을 두는 진화 시스템(예를 들어 휴대 전화와 같은)의 경계를 어떻게 정할지 선택하든 간에 이를테면 새로운 아이디어가 특정한 시기에 출현한다는 사실 같은, 여러분의 모델이 그저 주어진 것으로 받아들여야만 하는 어떤 것들이 있을 것이다.
+Indeed, all models must make simplifying assumptions of this nature. ## 실제로, ‘모든’ 모델은 이러한 성격의 단순화하는 가정들을 세워야만 한다.
+When Wallace and Darwin presented their verbal model of biological evolution, there was little knowledge of how variation generation and inheritance worked. ## Wallace와 Darwin이 생물학적 진화에 대한 자신들의 언어적 모델을 제시했을 때, 변이 생성과 유전이 어떻게 작동하는지에 관해서는 거의 알지 못했다.
+They just took as a given that these things happened somehow. ## 그들은 이러한 것들이 어떻게든 일어났다는 것을 그저 주어진 것으로 받아들였다.
+Even at the finest level of detail, we need simplifying assumptions. ## 가장 미세한 세부 수준에서조차, 우리는 단순화하는 가정들이 필요하다.
+Physicists, for example, must take as a given the mass and charge of fundamental particles. ## 예를 들어, 물리학자들은 기본 입자의 질량과 전하를 주어진 것으로 받아들여야만 한다.
+In a model of atomic bonds, physicists don’t attempt to explain why electrons have their particular mass and charge, they just accept the measured values and move on. ## 원자 결합 모델에서, 물리학자들은 ‘왜’ 전자가 그것의 특정한 질량과 전하를 갖는지 설명하려 시도하지 않고, 그들은 그저 측정된 값들을 받아들이고 넘어간다.
+The key point is that we can build useful models at one level of analysis without a complete accounting of what’s happening at all other levels. ## 핵심은 우리가 모든 다른 수준에서 일어나고 있는 것에 대한 완전한 설명 없이 하나의 분석 수준에서 유용한 모델을 구축할 수 있다는 것이다.
+`],
+["35","직장인 번아웃",`
+The recognition of burnout as an occupational phenomenon by the WHO in 2019 marked an important moment in the discourse on workplace mental health. ## 2019년 WHO에 의한 번아웃의 직업적 현상으로서의 인정은 직장에서의 정신 건강에 관한 담론에서 중요한 순간을 나타냈다.
+This designation reframes clinical assessment and organizational responsibility, shifting attention to systemic prevention. ## 이러한 지정은 임상적 평가와 조직의 책임을 재구성하여, 관심을 시스템 차원의 예방으로 이동시킨다.
+It invites employers to adopt structural interventions rather than relying solely on individual-level remedies. ## 그것은 고용주들이 오직 개인 수준의 해결책에만 의존하기보다는 구조적 개입을 채택하도록 이끈다.
+In practice, this means clinicians should collaborate with occupational health and leadership to address root causes. ## 실제로, 이것은 임상의들이 근본 원인을 다루기 위해 산업 보건 부서 및 지도부와 협력해야 한다는 것을 의미한다.
+It signaled a shift away from viewing burnout as a personal failing or a matter of individual resilience, toward understanding it as a structural issue rooted in organizational culture, leadership practices, and the broader socio-economic context of work. ## 그것은 번아웃을 개인적 실패나 개인의 회복 탄력성의 문제로 보는 것에서 벗어나, 그것을 조직 문화, 지도부 관행, 그리고 더 넓은 노동의 사회 경제적 맥락에 뿌리를 둔 구조적 문제로 이해하는 것으로 향하는 전환을 나타냈다.
+This reframing is essential, as it opens the door to systemic interventions and policy-level changes rather than placing the burden solely on individuals to cope or adapt. ## 이 재구성은 필수적인데, 왜냐하면 그것은 오직 개인에게만 대처하거나 적응하도록 부담을 지우기보다는 시스템 차원의 개입과 정책 수준의 변화로 향하는 문을 열어 주기 때문이다.
+`],
+["36","소리와 사람의 인식",`
+All sound begins with some kind of motion, something that disturbs molecules in air, water, steel, wood, or other medium. ## 모든 소리는 어떤 종류의 운동, 즉 공기, 물, 강철, 나무 또는 다른 매질 속의 분자들을 교란하는 어떤 것에서 시작된다.
+Isaac Newton noted that light waves are colorless; the perception of color only occurs in the brain of a living organism. ## Isaac Newton은 빛의 파동은 색이 없으며, 즉, 색에 대한 인식은 오직 살아 있는 생명체의 뇌에서만 일어난다고 지적했다.
+The same is true of sound. ## 소리 역시 마찬가지이다.
+Thus perception of sound begins at our eardrums — before it hits our eardrums, it is nothing more than the disturbance of molecules. ## 따라서 소리에 대한 인식은 우리의 고막에서 시작된다. 그것이 우리의 고막에 도달하기 전에는, 그것은 단지 분자들의 교란에 불과하다.
+We can measure that disturbance with gauges and instruments, but until it hits a brain, it is not sound. ## 우리는 측정기와 도구를 사용하여 그 교란을 측정할 수 있지만, 그것이 뇌에 도달할 때까지는 그것은 소리가 아니다.
+You may have heard the old philosophical riddle, “If a tree falls in the forest and no one is there to hear it, does it make it sound?” ## 여러분은 “숲에서 나무가 쓰러지고 그것을 들을 사람이 그곳에 아무도 없다면, 그것은 그것을 소리로 만드는가?”라는 오래된 철학적 난제를 들어 봤을지도 모른다.
+No, because sound is a psychological concept, a product of brains. ## 아니다. 왜냐하면 소리는 심리학적 개념, 즉 뇌가 만들어 내는 산물이기 때문이다.
+That tree will disturb molecules and make a mess, but if no creature hears it, no bird, fox, or human, it has not made sound. ## 그 나무는 분자들을 교란하고 혼란을 만들어 낼 것이지만, 어떤 생명체도, 즉 어떤 새도, 여우도, 또는 인간도 그것을 듣지 않는다면, 그것은 소리를 낸 것이 아니다.
+`],
+["37","온라인 협업의 어려움",`
+When people are collaborating face to face they can easily see each other and the range of different communication cues being used, so the task space is a subset of the communication space. ## 사람들이 대면하여 협업하고 있을 때, 그들은 서로를 그리고 사용되고 있는 다양한 의사소통 단서들의 범위를 쉽게 볼 수 있으며, 그래서 작업 공간은 의사소통 공간의 부분 집합이다.
+Ishii, a professor at the MIT Media Lab, describes this as seamless communication because there is no functional separation between the task and communication space. ## MIT Media Lab의 교수인 Ishii는 이것을 갈라진 틈이 없는 의사소통이라고 묘사하는데, 왜냐하면 작업 공간과 의사소통 공간 사이에 기능적 분리가 없기 때문이다.
+However, when people are working remotely, the task space is often separated from the communication space. ## 그러나 사람들이 원격으로 작업할 때, 그 작업 공간은 흔히 의사소통 공간으로부터 분리된다.
+For example, when video conferencing, people may have the face of their collaborator on one screen, while looking at a shared document on another. ## 예를 들어, 화상 회의를 할 때, 사람들은 한 화면에는 협업자의 얼굴을 두고, 동시에 다른 화면에서는 공유 문서를 보고 있을 수 있다.
+In this case, it is impossible to see many of the remote collaborator’s communication cues at the same time as looking at the task space. ## 이 경우, 작업 공간을 보는 것과 동시에 원격 협업자의 많은 의사소통 단서들을 보는 것은 불가능하다.
+So, there is an artificial seam between the communication space and task space. ## 그래서, 의사소통 공간과 작업 공간 사이에는 인위적인 갈라진 틈이 존재한다.
+This is the type of impact of remote communication technology that needs to be predicted through communication models. ## 이것은 의사소통 모델을 통해 예측될 필요가 있는 원격 의사소통 기술이 미치는 영향의 한 유형이다.
+`],
+["38","반복해서 들으면 사실처럼 느끼는 현상",`
+In 1977, psychologists Lynn Hasher and David Goldstein asked a group of college students how certain they were that sixty general-knowledge trivia-like statements were either true or false. ## 1977년, 심리학자 Lynn Hasher와 David Goldstein은 한 그룹의 대학생들에게 그들이 60개의 일반 상식과 관련된 잡학적 지식 같은 진술문들이 참인지 거짓인지를 얼마나 확신하는지 물었다.
+The students were asked to evaluate the sixty statements three times, at two-week intervals. ## 그 학생들은 그 60개의 진술문을 2주 간격으로 세 번 평가하도록 요청받았다.
+Crucially, only twenty of the statements were repeated each time; the other forty were new. ## 결정적으로, 그 진술문 중 오직 20개만이 매번 반복되었고, 나머지 40개는 새로운 것이었다.
+The researchers then compared the ‘truth-ratings’ of the repeated versus non-repeated statements. ## 그런 다음 그 연구자들은 반복된 진술문과 반복되지 않은 진술문의 ‘진실성 평가’를 비교했다.
+What they found was astonishing. ## 그들이 알아낸 것은 놀라웠다.
+Regardless of whether the statement was true or false, belief in the truth of the claim went up as a function of repetition. ## 그 진술문이 참이든 거짓이든 상관없이, 그 주장의 진실성에 대한 믿음은 반복의 작용에 따라 올라갔다.
+In other words, the more often you hear a statement, the more ‘true’ it sounds. ## 다시 말해, 여러분이 어떤 진술문을 더 자주 들을수록, 그것은 더 ‘참인’ 것처럼 들린다.
+This became known as the illusory truth effect. ## 이것은 진실 착각 효과로 알려지게 되었다.
+`],
+["39","잠수부와 수압",`
+The human body on the Earth’s surface experiences constant air pressure equal to 16-18 tons per square meter of its body surface. ## 지구 표면 위에서의 인체는 신체 표면 1제곱미터당 16에서 18톤에 달하는 일정한 기압을 겪는다.
+However, this pressure is not felt because external pressure is balanced by internal pressure in the lungs and air cavities of the body. ## 하지만 이러한 압력은 외부 압력이 신체의 폐와 공기가 들어 있는 공간의 내부의 압력과 균형이 맞춰지기 때문에 느껴지지 않는다.
+During dives, in addition to atmospheric pressure, the pressure of the water also acts on the human body. ## 잠수하는 동안에는 대기압 외에 물의 압력 또한 인체에 영향을 준다.
+When submerged underwater, to avoid feeling the pressure of the surrounding environment, it is necessary to maintain the condition of equal external and internal pressure. ## 물속에 잠겼을 때, 주변 환경의 압력을 느끼는 것을 피하기 위해 동일한 외부와 내부 압력 상태를 유지하는 것이 필요하다.
+To achieve this, air or a breathing mixture is supplied to the diver under pressure equal to the pressure applied by the surrounding water. ## 이를 달성하기 위해 공기 또는 호흡용 혼합물이 주변의 물에 의해 가해지는 압력과 동일한 압력으로 잠수부에게 제공된다.
+Water pressure increases proportionally with depth. ## 수압은 깊이에 비례하여 증가한다.
+It increases by 1 bar for every 10 meters. ## 그것은 10미터마다 1바씩 증가한다.
+It follows that a diver at a depth of 10 meters experiences a pressure of 2 bar, and to stabilize pressure, the supply of a breathing mixture under a pressure of 2 atmospheres is required. ## 당연히 10미터 깊이에 있는 잠수부는 2바의 압력을 겪고, 압력을 맞추기 위해서는 2기압의 호흡용 혼합물의 제공이 요구된다.
+`],
+["40","식물이 보내는 화학 신호",`
+Researchers recently found that goldenrods that live in peaceful areas without much threat from predators will issue chemical alarm calls that are incredibly specific — comprehensible only to their close kin — on the rare occasion they are attacked. ## 연구자들은 포식자들로부터의 많은 위협 없이 평화로운 지역에 사는 미역취들이 그들이 공격받는 드문 경우에, 그들의 가까운 친족만 이해할 수 있는 매우 독특한 화학적 비상 신호를 내보낸다는 것을 최근에 발견했다.
+But goldenrods in more hostile territory signal to their neighbors using chemical phrases easily understood by all the goldenrod in the area, not just their biological kin. ## 하지만 더 적대적인 지역에 있는 미역취들은 그들의 생물학적 친족뿐만 아니라 그 지역에 있는 모든 미역취에 의해 쉽게 이해되는 화학적 표현을 사용하여 그들의 이웃들에게 신호를 보낸다.
+Instead of using coded whisper networks, these goldenrod broadcast the threat over loudspeaker, so to speak. ## 암호화된 속삭이는 네트워크를 사용하는 대신에 이 미역취는 말하자면 확성기를 통해서 위협을 널리 알린다.
+It is the first time research has confirmed that these chemical communications are beneficial not only to the plant receiving them but also to the sender. ## 그것은 이러한 화학적 교신들이 그것들을 받는 식물뿐만 아니라 보내는 식물에게도 이롭다는 것을 확인한 첫 연구이다.
+When times are truly tough, you do not want to be left standing in a field alone. ## 정말로 힘든 시기에는, 여러분은 들판에 혼자 서 있는 채로 남겨지길 원하지 않는다.
+There will be no one to mate with, no one to help bring in pollinators. ## 짝짓기할 상대, 꽃가루 매개자를 불러들이는 것을 도와줄 상대도 없을 것이다.
+Compared to those in peaceful areas, goldenrods in more hostile environments send more broadly understandable chemical messages, thereby benefiting both the senders and the receivers. ## 평화로운 지역에 있는 미역취들에 비해, 더 적대적 환경에 있는 미역취들은 더 널리 이해할 수 있는 화학적 신호들을 보내고, 그렇게 함으로써 발신자들과 수신자들 모두를 이롭게 한다.
+`],
+["41~42","인터넷의 사용자 조종 설계",`
+Patterns such as infinite scroll, autoplaying videos, or requiring an account just to make a purchase all interfere with the user’s control over their own experience. ## 무한 스크롤, 자동 재생 영상, 혹은 단지 구매를 하기 위해 계정을 요구하는 것과 같은 패턴들은 모두 사용자들이 자기 자신의 경험을 통제하는 것을 방해한다.
+From a sustainability perspective, many of these patterns encourage overconsumption of data and attention. ## 지속가능성의 관점에서 이러한 패턴들 중 많은 것들이 데이터와 주의력의 과잉 소비를 부추긴다.
+Infinite scroll keeps loading new content whether the user wants it or not, increasing data usage and device processing. ## 무한 스크롤은 사용자가 그것을 원하든 원하지 않든 새로운 콘텐츠를 계속해서 로딩하고, 이는 데이터 사용과 기기의 처리 작업을 증가시킨다.
+Autoplay forces media to load and play even for people who may never watch it. ## 자동 재생은 매체가 그것을 절대 시청하지 않을 사람들에게조차도 로딩하고 재생하도록 강요한다.
+These choices consume more energy on both the user’s device and the servers delivering the content. ## 이러한 선택들은 사용자의 기기와 콘텐츠를 전달하는 서버 모두에서 더 많은 에너지를 소비한다.
+Take the decision by a popular music streaming platform to replace static album artwork with short video loops by default. ## 한 인기 음악 스트리밍 플랫폼이 기본값으로 정적인 앨범 표지를 짧은 영상의 반복으로 대체하기로 한 결정을 예로 들어 보자.
+This change significantly increases data usage and battery consumption, while the option to disable it is buried deep in the settings. ## 이러한 변화는 데이터 사용과 배터리 소비를 상당히 증가시키고, 반면 그것을 비활성화하는 선택은 설정 메뉴 속 깊이 숨겨져 있다.
+As a result, most users consume more resources unless they actively search for a way to opt out. ## 그 결과 대부분의 사용자들은 그들이 적극적으로 빠져나올 방법을 찾지 않으면 더 많은 자원을 소비한다.
+It is important to acknowledge that web design always nudges behavior in some way. ## 웹 디자인이 항상 어떤 방식으로든 행동을 유도한다는 것을 인정하는 것은 중요하다.
+Showing consequences and highlighting options are all forms of influence. ## 결과를 보여 주는 것과 선택지를 강조하는 것은 모두 영향력의 형태이다.
+The ethical line is not whether nudging exists, but whether it is transparent, reversible, and aligned with the user’s interests. ## 윤리적 기준은 행동 유도가 존재하느냐가 아니라, 그것이 투명하고, 되돌릴 수 있으며, 사용자의 이익과 일치하는지이다.
+In many cases, the most responsible approach is to make the lower-impact option the default, while keeping alternatives clearly available. ## 많은 경우, 가장 책임 있는 접근 방법은 대안들을 분명하게 이용할 수 있도록 유지하면서 (환경에 미치는) 영향이 더 적은 선택지를 기본값으로 만드는 것이다.
+Defaults are powerful, and when chosen carefully, they can reduce environmental impact without removing user agency. ## 기본값들은 영향력이 크고, 신중하게 선택될 경우 그것들은 사용자 주체성을 없애지 않으면서 환경적 영향을 줄일 수 있다.
+`]
+]
+};
+
+const LESSONS = {
+"3과본문": `
+Katherine Johnson was born on August 26, 1918, in West Virginia, in the U.S., and was the youngest of four children in a black family. ## 캐서린 존슨은 1918년 8월 26일 미국 웨스트버지니아주에서 태어났으며 흑인 가정의 사 남매 중 막내였다.
+Katherine was a math prodigy from early childhood. ## 캐서린은 어릴 때부터 수학 영재였다.
+Reflecting on her youth, Katherine once said, “I counted everything — the steps to the road, the steps up to church, the number of dishes, spoons, and forks I washed.” ## 캐서린은 어린 시절을 회상하면서 “저는 도로로 가는 계단, 교회로 올라가는 계단, 내가 씻은 접시, 숟가락, 포크의 수 등 모든 것을 세었습니다.”라고 말했다.
+She excitedly added, “I couldn’t wait to get to high school to take algebra and geometry.” ## 그녀는 신이 나서 “저는 대수학과 기하학을 배우기 위해 하루빨리 고등학교에 가고 싶었어요.”라고 덧붙였다.
+But Katherine’s hometown had a segregated education system, and black students could not enter high school. ## 그러나 캐서린의 고향은 인종 차별적인 교육 제도를 갖고 있었고 흑인 학생들은 고등학교에 입학할 수 없었다.
+So her father moved the family 200 kilometers away so that she could enter high school. ## 그래서 그녀의 아버지는 그녀가 고등학교에 입학할 수 있도록 가족과 함께 2백 킬로미터 떨어진 곳으로 이사했다.
+After graduating from high school in 1932, she was admitted to a black college at the age of fifteen. ## 그녀는 1932년에 고등학교를 졸업한 뒤 15세에 흑인 대학에 입학했다.
+By her junior year, she had taken all the math courses the college could offer. ## 3학년 때 그녀는 대학에서 제공할 수 있는 모든 수학 과정을 수강했다.
+Her mentor gladly offered special classes just for her, but he was not happy when he had to tell his outstanding student about her career opportunities. ## 그녀의 멘토는 기꺼이 그녀만을 위한 특별 수업을 제공했지만 그는 그의 뛰어난 학생에게 그녀의 직업 기회에 대해 이야기해야만 했을 때 기쁘지 않았다.
+“You would make a good research mathematician,” he told his seventeen-year-old student, “and I’m going to prepare you for this career.” ## 그는 17세 학생에게 “너는 훌륭한 연구 수학자가 될 거야. 그리고 나는 네가 이 직업을 준비할 수 있게 해 줄 거야.”라고 말했다.
+Katherine asked, “Where will I find a job?” ## 캐서린은 “저는 어디에서 일자리를 찾을 수 있을까요?”라고 물었다.
+“That,” he replied, “will be your problem.” ## “그게 너의 문제가 되겠지.”라고 그는 대답했다.
+The path ahead was unclear and full of obstacles, but Katherine knew she had the strength to make her own way. ## 앞으로의 길은 불분명하고 장애물로 가득 차 있었지만 캐서린은 자신의 길을 헤쳐 나갈 힘이 있다는 것을 알고 있었다.
+In 1935, at the age of eighteen, Katherine graduated from college with highest honors and began her career as a teacher at a black public school. ## 1935년, 18세에 캐서린은 최고의 성적으로 대학을 졸업하고 흑인 공립 학교에서 교사로 경력을 시작했다.
+At that time, teaching was the only option available to her. ## 가르치는 일은 그 당시 그녀가 할 수 있는 유일한 선택이었다.
+It was not until 1953 that Katherine found a job at a NASA field center in Virginia. ## 1953년이 되어서야 캐서린은 버지니아에 있는 NASA 필드 센터에서 일자리를 찾았다.
+There, she worked as one of the “Black computers” who did complex calculations manually to support white male engineers. ## 그곳에서 그녀는 백인 남성 엔지니어를 지원하기 위해 복잡한 계산을 수동으로 수행하는 '흑인 컴퓨터' 중 한 명으로 일했다.
+Though they greatly contributed to the space project, they endured a lot of discrimination, including segregation in the office and being referred to with terms like “girl” despite being professional women. ## 그들은 우주 프로젝트에 크게 기여했지만, 사무실에서 인종 차별을 당하고 전문직 여성임에도 불구하고 '여자애'라는 말로 불리는 등 많은 차별을 견뎌냈다.
+Two weeks into the job, Katherine was reassigned to NASA’s elite space research division. ## 입사 2주 만에 캐서린은 NASA의 엘리트 우주 연구 부서로 재배치되었다.
+There, she was the only black female member of the staff. ## 그곳에서 그녀는 직원 중 유일한 흑인 여성이었다.
+Despite her enormous contributions, the important research meetings were held only among white staff members. ## 그녀의 엄청난 공헌에도 불구하고 중요한 연구 회의는 백인 직원들 사이에서만 열렸다.
+When she asked for permission to attend the meetings, her male colleagues said that “the girls” didn’t usually go. ## 그녀가 회의에 참석하도록 허락해 달라고 요청했을 때 그녀의 남성 동료들은 '여자애들'은 보통 가지 않는다고 말했다.
+Katherine asked, “Is there a law that says I can’t go?” ## “갈 수 없다는 법이 있나요?”라고 캐서린은 물었다.
+The embarrassed male workers had no choice but to let her in. ## 당황한 남성 직원들은 그녀를 들여보낼 수밖에 없었다.
+By asking questions no one had ever asked, Katherine ended a discriminatory custom. ## 누구도 묻지 않았던 질문을 함으로써 캐서린은 차별적인 관습을 끝냈다.
+She had faced barriers, but her efforts to overcome them paid off. ## 그녀는 장벽에 직면했지만 이를 극복하려는 노력이 결실을 맺었다.
+She felt proud and continued her work with courage. ## 그녀는 자부심을 느꼈으며 용기를 갖고 일을 계속 해 나아갔다.
+In 1960, she wrote a research paper with another engineer about how to place a spacecraft into orbit. ## 1960년에 그녀는 다른 엔지니어와 함께 우주선을 궤도에 진입시키는 방법에 관한 연구 논문을 썼다.
+That was the first time a woman in her division received credit as an author of a research report. ## 그녀의 부서에서 여성이 연구 보고서의 저자로 인정받은 것은 이번이 처음이었다.
+Katherine’s remarkable calculations by hand were trusted more than digital computers. ## 캐서린의 놀라운 수동 계산은 디지털 컴퓨터보다 더 신뢰를 받았다.
+In early 1962, John Glenn, one of the pioneering American astronauts, was preparing to orbit the Earth for the first time in American history. ## 1962년 초, 미국의 선구적인 우주 비행사 중 한 명인 존 글렌은 미국 역사상 처음으로 지구 궤도를 돌기 위한 준비를 하고 있었다.
+NASA used an electronic computer, first introduced into the space program a year earlier, to calculate the spaceship’s trajectory, but it made many minor errors. ## NASA는 우주선의 궤적을 계산하기 위해 1년 전 우주 프로그램에 처음 도입된 전자 컴퓨터를 사용했지만 그것은 사소한 오류를 많이 만들어 냈다.
+Glenn, who was concerned about its accuracy, asked Katherine Johnson to double-check the machine’s figures by hand. ## 글렌은 그것의 정확도를 걱정했고, 캐서린 존슨에게 기계의 수치를 수동으로 다시 확인해 달라고 요청했다.
+“If she says the numbers are good,” he said, “I’m good to go.” ## “그녀가 숫자가 맞다고 하면, 나는 갈 준비가 됐어요.”라고 그는 말했다.
+Using only a pencil and a slide rule, Katherine spent a day and a half checking the calculations and finally made sure of them. ## 연필과 계산자만을 사용하여 캐서린은 하루 반 동안 계산값을 확인했고 마침내 확신했다.
+Eventually, Glenn became the first American astronaut to orbit the Earth. ## 결국 글렌은 지구 궤도를 선회한 최초의 미국 우주 비행사가 되었다.
+Katherine was also part of the team that performed calculations for Apollo 11, which sent the first three men to the Moon in 1969, and even the plan to put people on Mars, which is still being worked on today. ## 캐서린은 또한 1969년에 처음으로 세 사람을 달에 보냈던 아폴로 11호와 오늘날에도 여전히 진행 중인 화성에 사람을 보내려는 계획을 위해 계산을 수행하는 팀의 일원이었다.
+Katherine retired in 1986 after thirty-three years at NASA. ## 캐서린은 NASA에서 33년을 근무한 후 1986년에 은퇴했다.
+After that, she dedicated the rest of her life to championing access to STEM education for Black girls. ## 그 후 그녀는 흑인 소녀들이 STEM 교육을 받을 수 있도록 옹호하는 데 여생을 바쳤다.
+For her contributions, President Barack Obama awarded her the Presidential Medal of Freedom in 2015 and said, “Katherine G. Johnson refused to be limited by society’s expectations of her gender and race while expanding the boundaries of humanity’s reach.” ## 그녀의 공헌에 대해 버락 오바마 대통령은 2015년에 그녀에게 대통령 자유 훈장을 수여했으며 “캐서린 G. 존슨은 인류의 영역을 확장하면서 자신의 성별과 인종에 대한 사회의 기대에 얽매이지 않았습니다.”라고 말했다.
+In 2017, NASA dedicated a building in her honor in Virginia and named it the Katherine G. Johnson Computational Research Facility. ## 2017년 NASA는 그녀를 기리기 위해 버지니아에 건물을 헌정하고 캐서린 G. 존슨 컴퓨터 연구 시설이라고 이름을 붙였다.
+She died on February 24, 2020, at the age of 101, but her pioneering legacy will never be forgotten. ## 그녀는 2020년 2월 24일 101세의 나이로 세상을 떠났지만 그녀의 선구적인 유산은 결코 잊히지 않을 것이다.
+`,
+"4과본문": `
+Klara is an AF (Artificial Friend), a companion robot for children. ## 클라라는 아이들을 위한 반려 로봇인 AF(인공 친구)이다.
+She is solar-powered. ## 그녀는 태양열로 구동된다.
+She stays healthy when she gets the Sun’s nourishment but feels weak and lifeless without sunlight. ## 그녀는 태양의 영양분을 받으면 건강을 유지하지만 햇빛이 없으면 약하고 생명력이 없는 느낌을 받는다.
+At the robot store, she enjoyed taking in the outside world from the windows. ## 로봇 매장에서 그녀는 창문을 통해 바깥세상을 이해하는 것을 즐겼다.
+Klara closely observed what she saw, hoping to learn everything necessary to be a caring and helpful AF. ## 클라라는 배려하고 도움이 되는 AF가 되기 위해 필요한 모든 것을 배우기를 희망하면서 자신이 본 것을 면밀히 관찰했다.
+One evening, she discovered that a homeless man was lying on the street without moving. ## 어느 날 저녁, 그녀는 한 노숙자가 꼼짝도 하지 않고 거리에 누워 있는 것을 발견했다.
+Klara was sad as she believed he had died. ## 클라라는 그가 죽었다고 믿었기 때문에 슬퍼했다.
+But the next morning when the Sun was shining, she was surprised to see that the homeless man was sitting up and stroking his dog. ## 그러나 태양이 빛나던 다음 날 아침, 그녀는 노숙자가 일어나 앉아서 개를 쓰다듬고 있는 것을 보고 놀랐다.
+Klara believed the Sun had saved him and came to have strong faith in the Sun’s power to restore everything. ## 클라라는 태양이 그를 구해 주었다고 믿었고 모든 것을 회복시키는 태양의 힘에 대한 강한 믿음을 갖게 되었다.
+One day, a fourteen-year-old girl named Josie visited the shop with her mother, Chrissie. ## 어느 날, 조시라는 열네 살 소녀가 어머니 크리시와 함께 가게를 방문했다.
+Josie chatted with Klara joyfully. ## 조시는 클라라와 즐겁게 이야기를 나눴다.
+Josie immediately took a liking to Klara and asked whether Klara wanted to be her friend. ## 조시는 즉시 클라라를 마음에 들어 했고 클라라에게 그녀의 친구가 되고 싶은지 물었다.
+[Josie] I really want you to come to my home. ## 네가 우리 집에 꼭 와 줬으면 좋겠어.
+[Josie] I think you’ll like my room, and we’ll see the beautiful sunset from the windows there. ## 내 방을 좋아할 것 같고, 우리는 거기 창문으로 아름다운 일몰을 볼 수 있을 거야.
+[Josie] We can do all the great things together all the time while I’m growing up. ## 우리는 내가 자라는 동안 모든 멋진 일들을 항상 함께 할 수 있어.
+[Josie] You want to come, right? ## 너도 오고 싶지?
+[Klara] (nodding hopefully) ## (희망에 차 고개를 끄덕인다)
+[Josie] That’s so good, but I want to be honest with you. ## 정말 잘됐지만 나는 너에게 솔직하고 싶어.
+[Josie] I know how bad you’ll feel after people promise you perfect things and they turn out not to be so. ## 사람들이 너에게 완벽한 것을 약속하고 그것이 그렇지 않은 것으로 밝혀지면 기분이 얼마나 나쁠지 알아.
+[Josie] Some days I’m not so healthy or happy. ## 나는 어떤 날은 그렇게 건강하지도 행복하지도 않아.
+[Josie] I do not know why. ## 왜 그런지 모르겠어.
+[Josie] Do you still want to come, Klara? ## 그래도 여전히 오고 싶니, 클라라?
+[Klara] If there’s anything difficult or scary, we will face it together. ## 힘들거나 무서운 일이 있으면 우리는 함께 이겨낼 거야.
+To show that she would do her best to be Josie’s friend, Klara held her hands together and shook them slightly. ## 조시의 친구가 되기 위해 최선을 다하겠다는 것을 보여 주기 위해 클라라는 두 손을 모으고 가볍게 흔들었다.
+Pleased by Klara’s gesture of friendship, Josie asked Chrissie for her permission to buy the AF. ## 클라라의 우정의 몸짓에 기뻐하며 조시는 크리시에게 AF 구입을 허락해 달라고 요청했다.
+Chrissie asked Klara what she had observed about Josie, and found Klara to be highly observant. ## 크리시는 클라라에게 조시에 대해 무엇을 관찰했는지 물었고 클라라가 관찰력이 매우 뛰어나다는 것을 알게 되었다.
+After requesting that Klara continue to care about Josie, Chrissie agreed to buy Klara and took her home. ## 클라라가 조시에게 계속 관심을 가질 것을 요청한 후 크리시는 클라라를 구입하는 것에 동의하고 그녀를 집으로 데려갔다.
+In Josie’s country home, Klara found out that Josie had gone through a procedure known as “lifting.” ## 조시의 시골집에서 클라라는 조시가 ‘리프팅’이라는 절차를 겪었다는 사실을 알게 되었다.
+By being lifted, Josie’s cognitive abilities had been genetically enhanced so that she had a better chance of getting into prestigious universities. ## 리프팅을 받음으로써 그녀가 명망 높은 대학에 입학할 가능성이 더 높아지도록 조시의 인지 능력은 유전적으로 향상되었다.
+However, Josie was suffering from serious side effects similar to those that had claimed the life of her sister, Sal. ## 그러나 조시는 언니인 샐의 목숨을 앗아간 것과 비슷한 심각한 부작용을 겪고 있었다.
+A mysterious chronic illness often caused her to stay in bed for days on end. ## 알 수 없는 만성 질환은 종종 그녀가 며칠 동안 침대에 누워 있게 만들었다.
+Because of this, Josie spent most of her time at home and was being educated there. ## 이 때문에 조시는 대부분의 시간을 집에서 보냈고 그곳에서 교육을 받고 있었다.
+One day when Josie felt better, her mother took her and Klara to the city so that Josie could have her portrait done by Mr. Capaldi. ## 조시의 상태가 나아진 어느 날, 그녀의 어머니는 조시의 초상화 작업이 카팔디 씨에 의해 이루어질 수 있도록 그녀와 클라라를 도시로 데려갔다.
+In Capaldi’s studio, Klara was asked to answer a questionnaire about Josie. ## 카팔디의 스튜디오에서 클라라는 조시에 관한 설문지에 답하라는 요청을 받았다.
+Looking around the studio after completing the questionnaire, Klara entered Capaldi’s office. ## 설문지를 작성한 뒤 스튜디오를 둘러보다가 클라라는 카팔디의 사무실로 들어섰다.
+To her surprise, she saw something that looked like Josie suspended in the air — it was an AF replica of Josie’s body! ## 놀랍게도, 그녀는 공중에 매달린 조시처럼 생긴 무언가를 보았다. 그것은 조시 몸의 AF 복제품이었다!
+As it turned out, Mr. Capaldi was not a painter but a scientist, who planned with Chrissie to transfer Klara’s consciousness to the replica and make a new Josie if the real Josie were to die. ## 알고 보니 카팔디 씨는 화가가 아니라 과학자였고, 그는 혹시나 진짜 조시가 죽게 된다면 클라라의 의식을 복제품에 옮겨 새로운 조시를 만들기로 크리시와 함께 계획을 세웠다.
+[Capaldi] Klara, tell me what you think about the replica. ## 클라라, 복제품에 대해 어떻게 생각하는지 말해 줘.
+[Klara] It resembles Josie quite accurately. ## 조시를 꽤 정확하게 닮았어요.
+[Klara] Mr. Capaldi, you have done a good job of capturing Josie’s appearance. ## 카팔디 씨, 조시의 모습을 잘 담아내셨네요.
+[Klara] I now understand why Chrissie asked me, at every step, to observe and learn Josie. ## 저는 이제 왜 크리시가 저에게 모든 단계에서 조시를 관찰하고 배우라고 요청했는지 알겠어요.
+[Klara] The survey seems to test how well I have come to know Josie and how well I understand her decisions and feelings. ## 이 설문 조사는 제가 조시를 얼마나 잘 알게 되었는지 그리고 그녀의 결정과 감정을 얼마나 잘 이해하는지 테스트하는 것 같군요.
+[Capaldi] We will ask you to become her and to live in that replica of Josie with everything you have learned. ## 우리는 너에게 그녀가 되어 네가 배운 모든 것을 가지고 조시의 복제품 안에서 살아가라고 부탁할 거야.
+[Capaldi] Learn Josie, not just superficially, but deeply, entirely. ## 피상적으로 뿐만 아니라 깊이, 완전히 조시를 배우도록 해.
+[Capaldi] You have to continue her for Chrissie and for everyone else who loves Josie. ## 크리시와 조시를 사랑하는 다른 모든 사람들을 위해 그녀를 이어가야만 해.
+[Chrissie] I have doubts. ## 의구심이 들어요.
+[Chrissie] I’m still not sure if this whole plan is the best thing we can do. ## 이 계획 전체가 우리가 할 수 있는 최선의 일인지 아직도 모르겠어요.
+[Chrissie] I have been afraid of losing Josie ever since I lost Sal. ## 나는 샐을 잃은 이후로 줄곧 조시를 잃을까 봐 두려워했어요.
+[Chrissie] That is why I agreed with you on this replica, but however well you make it, I don’t think I will be able to accept this AF as my Josie. ## 그게 바로 제가 이 복제품에 대해 당신에게 동의한 이유지만 당신이 아무리 그것을 잘 만든다고 해도 나는 이 AF를 나의 조시로 받아들일 수 없을 것 같아요.
+[Capaldi] You must not lose faith, Chrissie. ## 믿음을 잃어서는 안 됩니다, 크리시.
+[Capaldi] The survey Klara has successfully completed is clear evidence that she is already well on her way to understanding all of Josie’s drives and desires. ## 클라라가 성공적으로 완료한 설문 조사는 그녀가 이미 조시의 모든 충동과 욕구를 잘 이해하고 있다는 분명한 증거예요.
+[Capaldi] You believe that there is something unreachable inside each of us, something that is unique and won’t transfer. ## 당신은 우리 각자의 내면에 닿을 수 없는 무언가, 독특하고 옮겨지지 않는 무언가가 있다고 믿죠.
+[Capaldi] But there is nothing like that. ## 하지만 그런 건 없습니다.
+[Capaldi] The new Josie won’t be an imitation. ## 새로운 조시는 모조품이 아니에요.
+[Capaldi] She will be the exact same person and you will have every right to love her just as you love Josie now. ## 그녀는 정확히 같은 사람이 될 것이고 당신은 지금 조시를 사랑하는 것처럼 그녀를 사랑할 모든 권리를 갖게 될 거예요.
+[Chrissie] But will I believe in it? ## 하지만 내가 그걸 믿게 될까요?
+[Chrissie] When the day comes, will I really? ## 그날이 오면 정말 그렇게 될까요?
+[Klara] Excuse me, but I would like to say there is a chance you will never need the new Josie. ## 죄송하지만, 새로운 조시가 필요하지 않을 가능성이 있다고 말씀드리고 싶어요.
+[Klara] She may overcome her illness. ## 그녀는 질병을 이겨 낼지도 몰라요.
+[Klara] If the day comes when you do need the new Josie, I will do my best to become as close to her as possible. ## 만약 당신에게 정말로 새로운 조시가 필요한 날이 오면, 나는 가능한 한 그녀와 가까워지기 위해 최선을 다할 거예요.
+[Klara] However, it is wrong to give up hope already. ## 그러나 벌써 희망을 포기하는 것은 잘못됐어요.
+Josie’s health took a turn for the worse after she returned from the city. ## 도시에서 돌아온 후 조시의 건강은 악화되었다.
+This made Klara determined to do everything she could for Josie. ## 이는 클라라로 하여금 조시를 위해 할 수 있는 모든 일을 하기로 결심하도록 만들었다.
+Klara remembered the barn into which the Sun had disappeared when she and Josie had been watching the sunset in Josie’s room. ## 클라라는 조시와 함께 조시의 방에서 일몰을 바라봤을 때 태양이 사라졌던 헛간을 기억했다.
+Believing it to be the Sun’s resting place, Klara visited there to pray to the Sun for Josie’s recovery. ## 클라라는 그곳이 태양이 쉬는 곳이라고 믿었기에 조시의 회복을 위해 태양에게 기도하려고 그곳을 방문했다.
+[Klara] You must be so tired, and I’m very sorry to disturb you, but I have come here this evening to ask a special favor. ## 많이 피곤하시죠. 방해해서 정말 죄송하지만 오늘 저녁 특별한 부탁을 드리려고 여기 왔어요.
+[Klara] I have never forgotten how strong your power to restore everything is. ## 저는 모든 것을 회복시키는 당신의 힘이 얼마나 강력한지 한 번도 잊은 적이 없어요.
+[Klara] Josie is becoming weaker and weaker each day. ## 조시는 날이 갈수록 점점 더 약해지고 있어요.
+[Klara] Please send Josie the special nourishment she so desperately requires as you did that day to the homeless man. ## 그날 노숙자에게 했던 것처럼 조시가 절실히 필요로 하는 특별한 영양분을 보내 주세요.
+The Sun was then sinking into the ground, but Klara could tell he was smiling at her as he went down for his nightly rest. ## 태양은 땅속으로 가라앉고 있었지만 클라라는 그가 밤의 휴식을 위해 내려가면서 그녀에게 미소를 짓고 있다는 것을 알 수 있었다.
+Out of gratitude and respect, Klara continued to look at the Sun until his last light vanished into the ground. ## 감사와 존경심에 클라라는 태양의 마지막 빛이 땅 속으로 사라질 때까지 계속해서 태양을 바라보았다.
+After several rainy days, the Sun came out to shine light on Josie and her whole bed. ## 며칠간 비가 내린 후, 태양이 나와서 조시와 그녀의 침대 전체를 밝게 비췄다.
+Josie woke up and made a miraculous recovery. ## 조시는 잠에서 깨어나 기적적으로 회복했다.
+Seasons and years went by, and she grew into a healthy adult. ## 계절과 세월이 흘렀고 그녀는 건강한 어른으로 성장했다.
+When Josie left for college, Klara was sent to the Yard, a place where old AFs spend their remaining days at the end of their lives. ## 조시가 대학으로 떠날 때, 클라라는 낡은 AF가 삶의 막바지에서 남은 생을 보내는 곳인 야적장으로 보내졌다.
+In the Yard, she remembered her days with Josie. ## 야적장에서 그녀는 조시와 함께한 시절을 기억했다.
+[Klara] Josie was the best teenager for me. ## 조시는 저에게 최고의 십 대였어요.
+[Klara] I did all I could to learn Josie and to do what was best for her. ## 나는 조시를 배우고 그녀에게 최선을 다하기 위해 할 수 있는 모든 것을 다했어요.
+[Klara] If it had become necessary, I could have continued Josie. ## 필요하다면 조시를 이어 나갈 수도 있었겠죠.
+[Klara] But I don’t think it would have worked out so well. ## 그런데 그렇게 잘 됐을 것 같지는 않아요.
+[Klara] Not because I wouldn’t have achieved accuracy, but however hard I tried, I believe now there would have remained something beyond my reach. ## 정확성을 얻지 못했을 거라서가 아니라, 아무리 열심히 노력한다고 해도 내가 닿을 수 없는 뭔가가 남아 있었을 거라고 이제는 믿어요.
+[Klara] Mr. Capaldi believed there was nothing special inside Josie, but I believe now that there was something very special. ## 카팔디 씨는 조시 안에 특별한 것이 없다고 믿었지만 저는 지금 뭔가 아주 특별한 것이 있었다고 믿어요.
+[Klara] But it wasn’t inside Josie. ## 그러나 그건 조시 안에 있지 않았어요.
+[Klara] It was inside those who loved her. ## 그건 그녀를 사랑하는 사람들의 마음속에 있었죠.
+[Klara] I would have never reached what they felt for Josie in their hearts. ## 나는 그들이 조시에 대해 마음속으로 느끼는 감정에 결코 도달하지 못했을 거예요.
+[Klara] I am sure of this now. ## 나는 지금 이것을 확신해요.
+`
+};
+
+const BRK = new Set("in on at of for from with by about as into to over under after before during through between than like without among across around and but or so because although while when where which who whom whose that if whether since until unless though whereas how what why".split(" "));
+const PUNC_END = /[,;:—]["”’]?$/;
+
+function chunkify(en){
+  const raw = en.split(/\s+/).filter(Boolean);
+  const words = [];
+  for (const w of raw){
+    if ((w === '—' || w === '...') && words.length) words[words.length-1] += ' ' + w;
+    else words.push(w);
+  }
+  const groups = []; let cur = [];
+  for (const w of words){
+    const k = w.toLowerCase().replace(/[^a-z]/g,'');
+    if (cur.length && BRK.has(k)){ groups.push(cur); cur = []; }
+    cur.push(w);
+    if (PUNC_END.test(w)){ groups.push(cur); cur = []; }
+  }
+  if (cur.length) groups.push(cur);
+  const out = [];
+  for (let g = 0; g < groups.length; g++){
+    const c = groups[g];
+    if (c.length === 1 && !PUNC_END.test(c[0]) && g < groups.length - 1){
+      groups[g+1] = c.concat(groups[g+1]); continue;
+    }
+    out.push(c);
+  }
+  if (out.length > 1 && out[out.length-1].length === 1 && out[out.length-2].length < 4){
+    const l = out.pop(); out[out.length-1] = out[out.length-1].concat(l);
+  }
+  const fin = [];
+  for (const c of out){
+    if (c.length <= 4){ fin.push(c.join(' ')); continue; }
+    const parts = Math.ceil(c.length / 3), size = Math.ceil(c.length / parts);
+    for (let i = 0; i < c.length; i += size) fin.push(c.slice(i, i + size).join(' '));
+  }
+  if (fin.length < 2) return words.length > 1 ? words : fin;
+  return fin;
+}
+
+function parseRaw(raw){
+  const res = [];
+  for (const line of raw.split('\n')){
+    const t = line.trim(); if (!t) continue;
+    const m = t.match(/^(?:\[([^\]]+)\]\s*)?(.+?)\s*##\s*(.+)$/);
+    if (!m) continue;
+    const en = m[2].trim();
+    const chunks = chunkify(en);
+    if (chunks.length < 2) continue;
+    res.push({spk: m[1] || '', en, ko: m[3].trim(), chunks});
+  }
+  return res;
+}
+
+function shuffle(a){
+  const n = a.length; let b;
+  for (let tries = 0; tries < 12; tries++){
+    b = a.slice();
+    for (let i = n - 1; i > 0; i--){ const j = Math.floor(Math.random() * (i + 1)); [b[i], b[j]] = [b[j], b[i]]; }
+    if (n < 2 || b.some((v, i) => v !== a[i])) break;
+  }
+  return b;
+}
+//#PURE-END
+
+const app = document.getElementById('app');
+let stack = [{v:'home'}];
+let S = [];
+
+function esc(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function go(v){ stack.push(v); render(); }
+function back(){ if (stack.length > 1){ stack.pop(); render(); } }
+function home(){ stack = [{v:'home'}]; render(); }
+
+function bar(title){
+  return `<div class="bar"><button onclick="home()">홈</button><button onclick="back()">이전</button><span class="t">${esc(title||'')}</span></div>`;
+}
+
+function render(){
+  const cur = stack[stack.length - 1];
+  window.scrollTo(0, 0);
+  if (cur.v === 'home'){
+    app.innerHTML = `<div class="home"><h1>단어 배열 연습</h1>
+      <button class="big" onclick="go({v:'list',exam:'모고25'})">모고25</button>
+      <button class="big" onclick="go({v:'list',exam:'모고26'})">모고26</button>
+      <button class="big" onclick="openLesson('3과본문')">3과본문</button>
+      <button class="big" onclick="openLesson('4과본문')">4과본문</button></div>`;
+  } else if (cur.v === 'list'){
+    const items = EXAMS[cur.exam];
+    app.innerHTML = bar(cur.exam) + `<div class="list">` + items.map((it, i) =>
+      `<button class="row" onclick="openItem('${cur.exam}',${i})"><span class="n">${it[0]}</span><span>${esc(it[1])}</span></button>`).join('') + `</div>`;
+  } else if (cur.v === 'practice'){
+    S = parseRaw(cur.raw).map(s => ({...s, order: shuffle(s.chunks.map((_, i) => i)), slots: new Array(s.chunks.length).fill(null), graded: false}));
+    app.innerHTML = bar(cur.title) + S.map((_, i) => cardHTML(i)).join('');
+  }
+}
+function openItem(exam, i){ const it = EXAMS[exam][i]; go({v:'practice', title: `${exam} · ${it[0]}번 ${it[1]}`, raw: it[2]}); }
+function openLesson(name){ go({v:'practice', title: name, raw: LESSONS[name]}); }
+
+function cardHTML(i){
+  const s = S[i], n = s.chunks.length;
+  const bank = s.order.filter(id => !s.slots.includes(id));
+  let slots = '';
+  for (let k = 0; k < n; k++){
+    const id = s.slots[k];
+    if (id === null){
+      slots += `<span class="slot${s.graded ? ' empty-bad' : ''}" data-k="${k}"></span>`;
+    } else {
+      let cls = '';
+      if (s.graded) cls = s.chunks[id] === s.chunks[k] ? ' ok' : ' bad';
+      slots += `<span class="slot filled" data-k="${k}"><span class="chip${cls}" data-id="${id}" data-src="s">${esc(s.chunks[id])}</span></span>`;
+    }
+  }
+  const bankHTML = bank.map(id => `<span class="chip" data-id="${id}" data-src="b">${esc(s.chunks[id])}</span>`).join('');
+  let res = '';
+  if (s.graded){
+    const okAll = s.slots.every((id, k) => id !== null && s.chunks[id] === s.chunks[k]);
+    res = `<div class="res"><b class="${okAll ? 'ok' : 'bad'}">${okAll ? '정답' : '오답'}</b><div class="ans">${esc(s.en)}</div></div>`;
+  }
+  return `<div class="card${s.graded ? ' locked' : ''}" id="c${i}" data-i="${i}">
+    <div class="head"><span class="num">${i + 1}</span>${s.spk ? `<span class="spk">${esc(s.spk)}</span>` : ''}</div>
+    <div class="ko">${esc(s.ko)}</div>
+    <div class="slots">${slots}</div>
+    <div class="bank">${bankHTML}</div>
+    <div class="act"><button onclick="grade(${i})">채점</button><button onclick="resetCard(${i})">초기화</button></div>
+    ${res}</div>`;
+}
+function drawCard(i){ document.getElementById('c' + i).outerHTML = cardHTML(i); }
+function grade(i){ S[i].graded = true; drawCard(i); }
+function resetCard(i){ const s = S[i]; s.slots.fill(null); s.graded = false; s.order = shuffle(s.chunks.map((_, k) => k)); drawCard(i); }
+
+function place(i, id, k){
+  const s = S[i], cur = s.slots.indexOf(id);
+  if (k < 0){ if (cur >= 0) s.slots[cur] = null; }
+  else {
+    const other = s.slots[k];
+    if (cur >= 0) s.slots[cur] = other;
+    s.slots[k] = id;
+  }
+  drawCard(i);
+}
+function firstEmpty(i){ return S[i].slots.indexOf(null); }
+
+let drag = null;
+app.addEventListener('pointerdown', e => {
+  const chip = e.target.closest('.chip');
+  if (!chip) return;
+  const card = chip.closest('.card'); if (!card) return;
+  const i = +card.dataset.i;
+  if (S[i].graded) return;
+  e.preventDefault();
+  drag = {chip, i, id: +chip.dataset.id, src: chip.dataset.src, sx: e.clientX, sy: e.clientY, moved: false, ghost: null, pid: e.pointerId};
+});
+window.addEventListener('pointermove', e => {
+  if (!drag || e.pointerId !== drag.pid) return;
+  if (!drag.moved && Math.hypot(e.clientX - drag.sx, e.clientY - drag.sy) > 6){
+    drag.moved = true;
+    const g = drag.chip.cloneNode(true);
+    g.className = 'chip ghost'; document.body.appendChild(g);
+    drag.ghost = g; drag.chip.classList.add('lift');
+  }
+  if (drag.ghost){ drag.ghost.style.left = e.clientX + 'px'; drag.ghost.style.top = e.clientY + 'px'; }
+});
+function endDrag(e, cancel){
+  if (!drag || e.pointerId !== drag.pid) return;
+  const d = drag; drag = null;
+  if (d.ghost) d.ghost.remove();
+  if (cancel){ d.chip.classList.remove('lift'); return; }
+  if (!d.moved){
+    if (d.src === 'b'){ const k = firstEmpty(d.i); if (k >= 0) place(d.i, d.id, k); }
+    else place(d.i, d.id, -1);
+    return;
+  }
+  const el = document.elementFromPoint(e.clientX, e.clientY);
+  const card = document.getElementById('c' + d.i);
+  let target = null;
+  if (el && card && card.contains(el)){
+    const slot = el.closest('.slot');
+    if (slot) target = +slot.dataset.k;
+    else if (el.closest('.slots')){ const k = firstEmpty(d.i); target = k >= 0 ? k : null; }
+    else if (el.closest('.bank') && d.src === 's') target = -1;
+  }
+  if (target === null) d.chip.classList.remove('lift');
+  else place(d.i, d.id, target);
+}
+window.addEventListener('pointerup', e => endDrag(e, false));
+window.addEventListener('pointercancel', e => endDrag(e, true));
+
+render();
+</script>
+</body>
+</html>
+
+</body></html>
